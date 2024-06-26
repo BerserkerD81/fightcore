@@ -7,11 +7,13 @@ import PostForm from './formArchivo';
 import './App.css';
 import { addCircle, home, search, person } from 'ionicons/icons';
 
+// Importa los estilos básicos de Ionic
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
 
+// Importa los estilos opcionales de Ionic
 import '@ionic/react/css/padding.css';
 import '@ionic/react/css/float-elements.css';
 import '@ionic/react/css/text-alignment.css';

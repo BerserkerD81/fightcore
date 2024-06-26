@@ -1,38 +1,118 @@
-.App {
-  text-align: center;
-}
+/* src/App.css */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #34282f;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+/* General styles for the app */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #1e1e1e;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.ion-padding {
+  padding: 16px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.ion-page {
+  background: linear-gradient(180deg, #1c1f94 0%, #3d4db7 100%);
+}
+
+.ion-header {
+  --background: transparent;
+}
+
+.ion-toolbar {
+  --background: transparent;
+}
+
+ion-title {
+  color: white;
+}
+
+ion-button {
+  --background: transparent;
+  --color: white;
+}
+
+ion-button:hover {
+  --background: #3171e0;
+}
+
+.ion-modal-custom {
+  --background: transparent;
+  --border-radius: 10px;
+}
+
+.ion-content-custom {
+  --background: transparent;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+form ion-input,
+form ion-textarea {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: black;
+}
+
+form ion-button {
+  margin-top: 16px;
+}
+
+form ion-img {
+  margin-top: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+form ion-button[type='submit'] {
+  background-color: #3880ff;
+  color: white;
+}
+
+form ion-button[type='submit']:hover {
+  background-color: #3171e0;
+}
+
+ion-footer {
+  background-color: #1e1e1e;
+}
+
+ion-toolbar {
+  background-color: #1e1e1e;
+}
+
+.post-options ion-button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #282828;
+  margin: 4px 0;
+  --border-radius: 10px;
+  --padding-start: 10px;
+}
+
+.post-options ion-icon {
+  --margin-end: 12px;
+  font-size: 24px;
+  color: #00ffcc;
+}
+
+.custom-icon {
+  font-size: 20px;
 }
