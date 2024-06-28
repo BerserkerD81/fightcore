@@ -1,4 +1,3 @@
-// src/PostForm.js
 
 import React, { useState } from 'react';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';

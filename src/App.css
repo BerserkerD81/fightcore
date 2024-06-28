@@ -1,6 +1,4 @@
-/* src/App.css */
 
-/* General styles for the app */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -15,7 +13,7 @@ body {
 }
 
 .ion-page {
-  background: linear-gradient(180deg, #1c1f94 0%, #3d4db7 100%);
+  background: linear-gradient(180deg, #4c0263 0%, #9037cc 100%);
 }
 
 .ion-header {
@@ -32,8 +30,9 @@ ion-title {
 
 ion-button {
   --background: transparent;
-  --color: white;
+  --color: rgb(0, 0, 0);
 }
+
 
 ion-button:hover {
   --background: #3171e0;
@@ -63,9 +62,9 @@ form ion-textarea {
   --padding-end: 8px;
   --padding-top: 12px;
   --padding-bottom: 12px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 8px;
-  background-color: white;
+  background-color: transparent;
   color: black;
 }
 
@@ -75,7 +74,7 @@ form ion-button {
 
 form ion-img {
   margin-top: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid red;
   border-radius: 8px;
   max-width: 100%;
 }

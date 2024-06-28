@@ -1,4 +1,3 @@
-// src/index.js or src/index.tsx
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -12,5 +11,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// Call the element loader after the platform has been bootstrapped
 defineCustomElements(window);
