@@ -4,7 +4,8 @@ import { IonIcon } from '@ionic/react';
 import { add, home, search, person, chatbubble } from 'ionicons/icons';
 import Modal from './components/partials/Modal';
 import Post from './components/partials/Post';
-import Chat from './components/partials/chats';
+import Chat from './components/partials/Chat';
+import Messages from './components/partials/Messages';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -45,8 +46,31 @@ const App = () => {
       message: "Este es el mensaje de la publicación 3."
     }
   ]);
+  const [chats, setChats] = useState([
+    {
+      id: 1,
+      avatar: "https://via.placeholder.com/60",
+      username: "Usuario4",
+      message: "Este es el mensaje del chat 1."
+    },
+    {
+      id: 2,
+      avatar: "https://via.placeholder.com/60",
+      username: "Usuario5",
+      message: "Este es el mensaje del chat 2."
+    },
+    {
+      id: 3,
+      avatar: "https://via.placeholder.com/60",
+      username: "Usuario6",
+      message: "Este es el mensaje del chat 3."
+    }
+  ]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [showPosts, setShowPosts] = useState(true); // Estado para alternar entre posts y chats
+  const [activeChat, setActiveChat] = useState(null); // Estado para el chat activo
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -55,7 +79,11 @@ const App = () => {
         containerRef.current &&
         containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight
       ) {
-        loadMorePosts();
+        if (showPosts) {
+          loadMorePosts();
+        } else {
+          loadMoreChats();
+        }
       }
     };
 
@@ -68,7 +96,7 @@ const App = () => {
         containerRef.current.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [posts]); // Dependencia de efecto para reajustar cuando cambian las publicaciones
+  }, [posts, chats, showPosts]); // Dependencia de efecto para reajustar cuando cambian las publicaciones o los chats
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -82,6 +110,16 @@ const App = () => {
 
   const handlePostDismiss = (postId) => {
     setPosts(posts.filter(post => post.id !== postId));
+  };
+
+  const handleChatClick = (chat) => {
+    console.log(`Hablando con ${chat.username}`);
+    console.log('Datos del chat:', chat);
+    setActiveChat(chat); // Establecer el chat activo al hacer clic en un chat
+  };
+
+  const handleChatDismiss = (chatId) => {
+    setChats(chats.filter(chat => chat.id !== chatId));
   };
 
   const generateRandomPost = () => {
@@ -99,9 +137,22 @@ const App = () => {
     };
   };
 
+  const generateRandomChat = () => {
+    const randomId = Math.floor(Math.random() * 1000);
+    const randomAvatar = `https://via.placeholder.com/60?text=User${randomId}`;
+    const randomMessage = `Este es el mensaje del chat ${randomId}.`;
+
+    return {
+      id: randomId,
+      avatar: randomAvatar,
+      username: `Usuario${randomId}`,
+      message: randomMessage
+    };
+  };
+
   const loadMorePosts = () => {
-    if (!isLoading) {
-      setIsLoading(true);
+    if (!isLoadingPosts) {
+      setIsLoadingPosts(true);
       setTimeout(() => {
         const newPosts = [];
         for (let i = 0; i < 3; i++) {
@@ -109,14 +160,33 @@ const App = () => {
           newPosts.push(newPost);
         }
         setPosts(prevPosts => [...prevPosts, ...newPosts]);
-        setIsLoading(false);
+        setIsLoadingPosts(false);
       }, 1000); // Simulación de carga
     }
   };
 
+  const loadMoreChats = () => {
+    if (!isLoadingChats) {
+      setIsLoadingChats(true);
+      setTimeout(() => {
+        const newChats = [];
+        for (let i = 0; i < 3; i++) {
+          const newChat = generateRandomChat();
+          newChats.push(newChat);
+        }
+        setChats(prevChats => [...prevChats, ...newChats]);
+        setIsLoadingChats(false);
+      }, 1000); // Simulación de carga
+    }
+  };
+
+  const toggleView = () => {
+    setShowPosts(prev => !prev); // Alternar entre posts y chats
+  };
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: isModalOpen ? 'none' : 'block' }}>
+      <div ref={containerRef} style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat) ? 'block' : 'none' }}>
         {posts.map(post => (
           <Post
             key={post.id}
@@ -128,10 +198,32 @@ const App = () => {
             onDismiss={handlePostDismiss}
           />
         ))}
-        {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
+        {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
-      <footer className="footer rounded-b-5xl" style={{ display: isModalOpen ? 'none' : 'flex' }}>
-        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
+      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat) ? 'block' : 'none' }}>
+        {chats.map(chat => (
+          <Chat
+            key={chat.id}
+            id={chat.id}
+            avatar={chat.avatar}
+            username={chat.username}
+            message={chat.message}
+            onDismiss={handleChatDismiss}
+            onChatClick={handleChatClick} // Pasar la función para manejar el clic en el chat
+          />
+        ))}
+        {isLoadingChats && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más chats...</p>}
+      </div>
+      {activeChat && (
+        <Messages
+          avatar={activeChat.avatar}
+          username={activeChat.username}
+          message={activeChat.message}
+        />
+
+      )}
+
+<footer className="footer rounded-b-5xl" style={{ display: (isModalOpen||activeChat) ? 'none' : 'flex' }}>        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={home} className="text-3xl" />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
@@ -140,7 +232,7 @@ const App = () => {
         <button className="h-28 w-32 border-gradient-plus flex items-center justify-center focus:outline-none -mt-2" onClick={openModal}>
           <IonIcon icon={add} className="text-5xl text-white" />
         </button>
-        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
+        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleView}>
           <IonIcon icon={chatbubble} className="text-3xl" />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
