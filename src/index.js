@@ -1,16 +1,21 @@
-// src/index.js or src/index.tsx
-
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import App from './App';
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import reportWebVitals from './reportWebVitals';
+import './index.css';
 
-ReactDOM.render(
+// Crear el root usando createRoot
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+
+// Renderizar la aplicación
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
-// Call the element loader after the platform has been bootstrapped
-defineCustomElements(window);
+// Si quieres medir el rendimiento de tu aplicación, pasa una función
+// para registrar los resultados (por ejemplo: reportWebVitals(console.log))
+// o envíalos a un endpoint de análisis. Aprende más: https://bit.ly/CRA-vitals
+reportWebVitals();

@@ -2,22 +2,21 @@
 
 import React, { useState } from 'react';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { IonButton, IonContent, IonImg, IonInput, IonModal, IonPage, IonTextarea, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, IonItem, IonLabel, IonActionSheet } from '@ionic/react';
-import { closeOutline, camera, images, person, gameController } from 'ionicons/icons';
+import { IonButton, IonContent, IonImg, IonInput, IonModal, IonPage, IonTextarea, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, IonItem, IonLabel } from '@ionic/react';
+import { closeOutline, camera, person, gameController } from 'ionicons/icons';
 
 const PostForm = ({ isOpen, onClose }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [showActionSheet, setShowActionSheet] = useState(false);
 
-  const selectImage = async (source) => {
+  const selectImage = async () => {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.Uri,
-        source: source,
+        source: CameraSource.Photos,
       });
 
       if (image) {
@@ -37,7 +36,7 @@ const PostForm = ({ isOpen, onClose }) => {
   };
 
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} className="ion-modal-custom">
+    <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -48,7 +47,7 @@ const PostForm = ({ isOpen, onClose }) => {
           <IonTitle>Crear publicación</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding ion-content-custom">
+      <IonContent className="ion-padding">
         <IonItem>
           <IonLabel position="floating">Título</IonLabel>
           <IonInput value={title} onIonChange={(e) => setTitle(e.detail.value)} required />
@@ -57,47 +56,21 @@ const PostForm = ({ isOpen, onClose }) => {
           <IonLabel position="floating">Descripción</IonLabel>
           <IonTextarea value={description} onIonChange={(e) => setDescription(e.detail.value)} required />
         </IonItem>
-        <IonButton expand="block" onClick={() => setShowActionSheet(true)}>
+        <IonButton expand="block" onClick={selectImage}>
           <IonIcon slot="start" icon={camera} />
           Subir Foto
         </IonButton>
         {selectedImage && <IonImg src={selectedImage} alt="Selected" />}
-        <div className="post-options">
-          <IonButton expand="block">
-            <IonIcon slot="start" icon={person} className="custom-icon" />
-            Elije tu personaje
-          </IonButton>
-          <IonButton expand="block">
-            <IonIcon slot="start" icon={gameController} className="custom-icon" />
-            Elegir modalidad
-          </IonButton>
-        </div>
-        <IonActionSheet
-          isOpen={showActionSheet}
-          onDidDismiss={() => setShowActionSheet(false)}
-          buttons={[
-            {
-              text: 'Tomar foto',
-              icon: camera,
-              handler: () => {
-                selectImage(CameraSource.Camera);
-              },
-            },
-            {
-              text: 'Elegir desde la galería',
-              icon: images,
-              handler: () => {
-                selectImage(CameraSource.Photos);
-              },
-            },
-            {
-              text: 'Cancelar',
-              role: 'cancel',
-            },
-          ]}
-        />
+        <IonButton expand="block">
+          <IonIcon slot="start" icon={person} />
+          Elije tu personaje
+        </IonButton>
+        <IonButton expand="block">
+          <IonIcon slot="start" icon={gameController} />
+          Elegir juego
+        </IonButton>
+        <IonButton expand="block" type="submit" onClick={handleSubmit}>Crear Post</IonButton>
       </IonContent>
-      <IonButton expand="block" type="submit" onClick={handleSubmit}>Crear Post</IonButton>
     </IonModal>
   );
 };
