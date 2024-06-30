@@ -6,6 +6,7 @@ import Modal from './components/partials/Modal';
 import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
+import GameLibrary from './components/partials/gameLibrary';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -101,10 +102,26 @@ const App = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const [showGameLibrary, setShowGameLibrary] = useState(false); // Nuevo estado para controlar la visibilidad de GameLibrary
+  const toggleGameLibrary = () => {
+    setShowGameLibrary(prev => !prev); // Alternar visibilidad de GameLibrary
+  };
   const handleSubmit = (e, body, selectedImage) => {
+    //esta es la funcion donde se mandaran las publicaciones a la bd por mientras hice que se creara y se mostrara aca 
     e.preventDefault();
-    console.log('Cuerpo de la publicación:', body);
-    console.log('URL de la imagen:', selectedImage);
+    // Generar un nuevo ID para la publicación
+    const newId = posts.length + 1;
+    // Crear la nueva publicación
+    const newPost = {
+      id: newId,
+      avatar: "https://via.placeholder.com/60", // Cambiar por el avatar real si es necesario
+      username: "UsuarioNuevo", // Cambiar por el usuario real si es necesario
+      postImage: selectedImage || "https://via.placeholder.com/600", // Usar la imagen seleccionada o una por defecto
+      message: body || "Nuevo mensaje", // Usar el cuerpo del mensaje ingresado o uno por defecto
+    };
+    // Agregar la nueva publicación a la lista de posts
+    setPosts([...posts, newPost]);
+    // Cerrar el modal después de agregar la publicación
     closeModal();
   };
 
@@ -135,6 +152,10 @@ const App = () => {
       postImage: randomPostImage,
       message: randomMessage
     };
+  };
+
+  const handleBackToChats = () => {
+    setActiveChat(null); // Volver a la vista de chats
   };
 
   const generateRandomChat = () => {
@@ -186,21 +207,22 @@ const App = () => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat) ? 'block' : 'none' }}>
-        {posts.map(post => (
-          <Post
-            key={post.id}
-            id={post.id}
-            avatar={post.avatar}
-            username={post.username}
-            postImage={post.postImage}
-            message={post.message}
-            onDismiss={handlePostDismiss}
-          />
+      <div ref={containerRef} style={{ marginTop:'10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+        {posts.map((post, index) => (
+          <div key={post.id} style={{ marginBottom: '10px' }}>
+            <Post
+              id={post.id}
+              avatar={post.avatar}
+              username={post.username}
+              postImage={post.postImage}
+              message={post.message}
+              onDismiss={handlePostDismiss}
+            />
+          </div>
         ))}
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
-      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat) ? 'block' : 'none' }}>
+      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
         {chats.map(chat => (
           <Chat
             key={chat.id}
@@ -209,7 +231,7 @@ const App = () => {
             username={chat.username}
             message={chat.message}
             onDismiss={handleChatDismiss}
-            onChatClick={handleChatClick} // Pasar la función para manejar el clic en el chat
+            onChatClick={handleChatClick}
           />
         ))}
         {isLoadingChats && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más chats...</p>}
@@ -219,15 +241,19 @@ const App = () => {
           avatar={activeChat.avatar}
           username={activeChat.username}
           message={activeChat.message}
+          onBack={handleBackToChats}
         />
-
       )}
-
-<footer className="footer rounded-b-5xl" style={{ display: (isModalOpen||activeChat) ? 'none' : 'flex' }}>        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
+      {showGameLibrary && (
+        <GameLibrary />
+      )}
+      
+      <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat ) ? 'none' : 'flex' }}>
+        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={home} className="text-3xl" />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
-          <IonIcon icon={search} className="text-3xl" />
+          <IonIcon icon={search}  onClick={toggleGameLibrary } className="text-3xl" />
         </button>
         <button className="h-28 w-32 border-gradient-plus flex items-center justify-center focus:outline-none -mt-2" onClick={openModal}>
           <IonIcon icon={add} className="text-5xl text-white" />
@@ -246,6 +272,7 @@ const App = () => {
       />
     </div>
   );
+  
 };
 
 export default App;

@@ -3,20 +3,20 @@ import { Plugins, Capacitor } from '@capacitor/core';
 import { VoiceRecorder } from 'capacitor-voice-recorder';
 import { CameraResultType, CameraSource } from '@capacitor/camera';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone, faMicrophoneSlash, faCamera, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash, faCamera, faPaperPlane, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FaWaveSquare } from 'react-icons/fa';
 
 const { Camera } = Plugins;
 
-const Messages = () => {
+const Messages = ({ username, avatar, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [recording, setRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPlaying, setCurrentPlaying] = useState(null);
   const [currentAudioWaves, setCurrentAudioWaves] = useState([]);
-  const [chatPartner, setChatPartner] = useState('Nombre del Usuario');
-  const [chatPartnerAvatar, setChatPartnerAvatar] = useState('https://via.placeholder.com/60');
+  const [chatPartner, setChatPartner] = useState(username);
+  const [chatPartnerAvatar, setChatPartnerAvatar] = useState(avatar);
   const [hasPermission, setHasPermission] = useState({ camera: false, audio: false });
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const messageListRef = useRef(null);
@@ -56,20 +56,19 @@ const Messages = () => {
         id: 2,
         text: '¡Hola! Estoy bien, ¿y tú?',
         timestamp: '2024-06-29T10:32:00Z',
-        sender: 'other_user',
+        sender: chatPartner,
       },
       {
         id: 3,
-        text: '¡Genial! Acabo de tomar esta foto.',
         image: 'https://via.placeholder.com/300',
         timestamp: '2024-06-29T10:35:00Z',
-        sender: 'user',
+        sender: chatPartner,
       },
       {
         id: 4,
         text: '¡Qué bonita foto!',
         timestamp: '2024-06-29T10:36:00Z',
-        sender: 'other_user',
+        sender: chatPartner,
       },
     ];
 
@@ -94,14 +93,9 @@ const Messages = () => {
       sender: 'user',
     };
 
-    const confirmationMessageObj = {
-      id: messages.length + 2,
-      text: 'Mensaje enviado',
-      timestamp: new Date().toISOString(),
-      sender: 'other_user',
-    };
 
-    setMessages([...messages, newMessageObj, confirmationMessageObj]);
+
+    setMessages([...messages, newMessageObj,]);
     setNewMessage('');
 
     if (scrollRef.current) {
@@ -131,14 +125,8 @@ const Messages = () => {
         sender: 'user',
       };
 
-      const confirmationMessageObj = {
-        id: messages.length + 2,
-        text: 'Imagen enviada',
-        timestamp: new Date().toISOString(),
-        sender: 'other_user',
-      };
 
-      setMessages([...messages, newMessageObj, confirmationMessageObj]);
+      setMessages([...messages, newMessageObj]);
 
     } catch (error) {
       console.error('Error al tomar la foto:', error);
@@ -175,14 +163,8 @@ const Messages = () => {
         sender: 'user',
       };
 
-      const confirmationMessageObj = {
-        id: messages.length + 2,
-        text: 'Audio enviado',
-        timestamp: new Date().toISOString(),
-        sender: 'other_user',
-      };
 
-      setMessages([...messages, newMessageObj, confirmationMessageObj]);
+      setMessages([...messages, newMessageObj, ]);
       setRecording(false);
     } catch (error) {
       console.error('Error al detener la grabación:', error);
@@ -236,7 +218,10 @@ const Messages = () => {
     <div className="flex flex-col h-full">
       <div className="bg-custom text-white p-4 flex items-center" style={{ zIndex: 10 }}>
         <img src={chatPartnerAvatar} alt="Avatar" className="w-12 h-12 rounded-full mr-4" />
-        <h2 className="text-lg font-bold">{chatPartner}</h2>
+        <h2 className="text-lg font-bold  " style={{color:'turquoise'}}>{chatPartner}</h2>
+        <button onClick={onBack} style={{ marginLeft: 'auto', padding: '0.5rem',  border: 'none', borderRadius: '5px',color:'magenta', cursor: 'pointer' }}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
       </div>
       <div
         ref={messageListRef}
@@ -272,7 +257,7 @@ const Messages = () => {
                   </button>
                   <div className="progress-bar flex items-center ml-2">
                     <div className="progress-bar-filled" style={{ width: `${currentPlaying === message.id ? progress : 0}%` }}>
-                      {/* Ondas de audio */}
+                      {/* Audio Waves */}
                       <div className="audio-waves">
                         {currentAudioWaves.map(wave => (
                           <div key={wave.id} className="audio-wave"></div>
@@ -333,6 +318,7 @@ const Messages = () => {
       <audio ref={audioPlayerRef} className="hidden" controls />
     </div>
   );
+  
 };
 
 export default Messages;

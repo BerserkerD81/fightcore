@@ -103,12 +103,13 @@ ion-button {
 /* Styles for mobile devices and small screens */
 @media (max-width: 767px) {
   .modal-container {
-    width: 90%; /* Width of the modal on mobile devices */
+    width: 100%; /* Width of the modal on mobile devices */
   }
 
   /* Move border-gradient higher on mobile devices */
   .border-gradient {
-    margin-bottom: 10%; /* Adjust as needed */
+    margin-bottom: 0%; /* Adjust as needed */
+    width: 100%
   }
 }
 .rotate-left {
@@ -185,6 +186,35 @@ ion-button {
   mask-composite: exclude;
   pointer-events: none;
 }
+
+.border-gradient-games {
+  position: relative;
+  border-radius: 10px;
+  padding: 10px;
+  border-left: none;
+  border-right: none;
+}
+
+.border-gradient-games::before {
+  content: "";
+  z-index: 15;
+  width: 200px;
+  height: 200px;
+  margin-left: 40%;
+  position: absolute;
+  inset: 0;
+  border-radius: 15px;
+  padding: 50px;
+  background: linear-gradient(to bottom, #191919 0%, #191919 30%, #191919 70%, #191919 100%);
+  background-size: 100% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+
+
 .border-gradient-fight{
   width: 65px;
   height: 65px;
