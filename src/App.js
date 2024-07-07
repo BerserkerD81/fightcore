@@ -6,7 +6,8 @@ import Modal from './components/partials/Modal';
 import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
-import GameLibrary from './components/partials/gameLibrary';
+import LoginGoogle from './components/partials/LoginGoogle'; // Asumiendo que es el componente de inicio de sesión de Google
+import GameLibrary from './components/partials/GameLibrary';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -73,8 +74,22 @@ const App = () => {
   const [showPosts, setShowPosts] = useState(true); // Estado para alternar entre posts y chats
   const [activeChat, setActiveChat] = useState(null); // Estado para el chat activo
   const containerRef = useRef(null);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para el estado de inicio de sesión
+  const [username, setUsername] = useState('');
+  const [profileImage, setProfileImage] = useState('');
   useEffect(() => {
+    // Check local storage for login status
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
+    if (storedLoginStatus === 'true') {
+      const storedUsername = localStorage.getItem('username');
+      const storedProfileImage = localStorage.getItem('profileImage');
+      setUsername(storedUsername);
+      setProfileImage(storedProfileImage);
+      console.log("user:",storedUsername);
+      console.log('Imagen de perfil:', profileImage);
+      setIsLoggedIn(true);;
+    }
+
     const handleScroll = () => {
       if (
         containerRef.current &&
@@ -106,8 +121,8 @@ const App = () => {
   const toggleGameLibrary = () => {
     setShowGameLibrary(prev => !prev); // Alternar visibilidad de GameLibrary
   };
+
   const handleSubmit = (e, body, selectedImage) => {
-    //esta es la funcion donde se mandaran las publicaciones a la bd por mientras hice que se creara y se mostrara aca 
     e.preventDefault();
     // Generar un nuevo ID para la publicación
     const newId = posts.length + 1;
@@ -205,9 +220,23 @@ const App = () => {
     setShowPosts(prev => !prev); // Alternar entre posts y chats
   };
 
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true); // Actualizar el estado de inicio de sesión
+    localStorage.setItem('isLoggedIn', 'true'); // Guardar el estado de inicio de sesión en localStorage
+    console.log('Imagen de perfil:', profileImage);
+    setUsername(localStorage.getItem('username'))
+    alert(localStorage.getItem('username'))
+  };
+  
+
+
+  if (!isLoggedIn) {
+    return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ marginTop:'10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
         {posts.map((post, index) => (
           <div key={post.id} style={{ marginBottom: '10px' }}>
             <Post
@@ -253,7 +282,7 @@ const App = () => {
           <IonIcon icon={home} className="text-3xl" />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
-          <IonIcon icon={search}  onClick={toggleGameLibrary } className="text-3xl" />
+          <IonIcon icon={search} onClick={toggleGameLibrary} className="text-3xl" />
         </button>
         <button className="h-28 w-32 border-gradient-plus flex items-center justify-center focus:outline-none -mt-2" onClick={openModal}>
           <IonIcon icon={add} className="text-5xl text-white" />
@@ -272,7 +301,6 @@ const App = () => {
       />
     </div>
   );
-  
 };
 
 export default App;
