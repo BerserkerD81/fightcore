@@ -6,8 +6,9 @@ import Modal from './components/partials/Modal';
 import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
-import LoginGoogle from './components/partials/LoginGoogle'; // Asumiendo que es el componente de inicio de sesión de Google
+import LoginGoogle from './components/partials/LoginGoogle';
 import GameLibrary from './components/partials/GameLibrary';
+import { findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -48,46 +49,25 @@ const App = () => {
       message: "Este es el mensaje de la publicación 3."
     }
   ]);
-  const [chats, setChats] = useState([
-    {
-      id: 1,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario4",
-      message: "Este es el mensaje del chat 1."
-    },
-    {
-      id: 2,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario5",
-      message: "Este es el mensaje del chat 2."
-    },
-    {
-      id: 3,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario6",
-      message: "Este es el mensaje del chat 3."
-    }
-  ]);
-
+  const [chats, setChats] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
-  const [showPosts, setShowPosts] = useState(true); // Estado para alternar entre posts y chats
-  const [activeChat, setActiveChat] = useState(null); // Estado para el chat activo
+  const [showPosts, setShowPosts] = useState(true);
+  const [activeChat, setActiveChat] = useState(null);
   const containerRef = useRef(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para el estado de inicio de sesión
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState('');
+  const [showGameLibrary, setShowGameLibrary] = useState(false);
+
   useEffect(() => {
-    // Check local storage for login status
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
     if (storedLoginStatus === 'true') {
       const storedUsername = localStorage.getItem('username');
       const storedProfileImage = localStorage.getItem('profileImage');
       setUsername(storedUsername);
       setProfileImage(storedProfileImage);
-      console.log("user:",storedUsername);
-      console.log('Imagen de perfil:', profileImage);
-      setIsLoggedIn(true);;
+      setIsLoggedIn(true);
     }
 
     const handleScroll = () => {
@@ -112,31 +92,33 @@ const App = () => {
         containerRef.current.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [posts, chats, showPosts]); // Dependencia de efecto para reajustar cuando cambian las publicaciones o los chats
+  }, [posts, chats, showPosts]);
+
+  useEffect(() => {
+    if (username) {
+      console.log("username:", username);
+      findChatsByUsername(username, setChats);
+    }
+  }, [username]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const [showGameLibrary, setShowGameLibrary] = useState(false); // Nuevo estado para controlar la visibilidad de GameLibrary
   const toggleGameLibrary = () => {
-    setShowGameLibrary(prev => !prev); // Alternar visibilidad de GameLibrary
+    setShowGameLibrary(prev => !prev);
   };
 
   const handleSubmit = (e, body, selectedImage) => {
     e.preventDefault();
-    // Generar un nuevo ID para la publicación
     const newId = posts.length + 1;
-    // Crear la nueva publicación
     const newPost = {
       id: newId,
-      avatar: "https://via.placeholder.com/60", // Cambiar por el avatar real si es necesario
-      username: "UsuarioNuevo", // Cambiar por el usuario real si es necesario
-      postImage: selectedImage || "https://via.placeholder.com/600", // Usar la imagen seleccionada o una por defecto
-      message: body || "Nuevo mensaje", // Usar el cuerpo del mensaje ingresado o uno por defecto
+      avatar: "https://via.placeholder.com/60",
+      username: "UsuarioNuevo",
+      postImage: selectedImage || "https://via.placeholder.com/600",
+      message: body || "Nuevo mensaje",
     };
-    // Agregar la nueva publicación a la lista de posts
     setPosts([...posts, newPost]);
-    // Cerrar el modal después de agregar la publicación
     closeModal();
   };
 
@@ -147,7 +129,7 @@ const App = () => {
   const handleChatClick = (chat) => {
     console.log(`Hablando con ${chat.username}`);
     console.log('Datos del chat:', chat);
-    setActiveChat(chat); // Establecer el chat activo al hacer clic en un chat
+    setActiveChat(chat);
   };
 
   const handleChatDismiss = (chatId) => {
@@ -170,7 +152,7 @@ const App = () => {
   };
 
   const handleBackToChats = () => {
-    setActiveChat(null); // Volver a la vista de chats
+    setActiveChat(null);
   };
 
   const generateRandomChat = () => {
@@ -197,7 +179,7 @@ const App = () => {
         }
         setPosts(prevPosts => [...prevPosts, ...newPosts]);
         setIsLoadingPosts(false);
-      }, 1000); // Simulación de carga
+      }, 1000);
     }
   };
 
@@ -212,23 +194,19 @@ const App = () => {
         }
         setChats(prevChats => [...prevChats, ...newChats]);
         setIsLoadingChats(false);
-      }, 1000); // Simulación de carga
+      }, 1000);
     }
   };
 
   const toggleView = () => {
-    setShowPosts(prev => !prev); // Alternar entre posts y chats
+    setShowPosts(prev => !prev);
   };
 
   const handleLoginSuccess = () => {
-    setIsLoggedIn(true); // Actualizar el estado de inicio de sesión
-    localStorage.setItem('isLoggedIn', 'true'); // Guardar el estado de inicio de sesión en localStorage
-    console.log('Imagen de perfil:', profileImage);
-    setUsername(localStorage.getItem('username'))
-    alert(localStorage.getItem('username'))
+    setIsLoggedIn(true);
+    localStorage.setItem('isLoggedIn', 'true');
+    setUsername(localStorage.getItem('username'));
   };
-  
-
 
   if (!isLoggedIn) {
     return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
@@ -239,14 +217,18 @@ const App = () => {
       <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
         {posts.map((post, index) => (
           <div key={post.id} style={{ marginBottom: '10px' }}>
+
             <Post
-              id={post.id}
               avatar={post.avatar}
               username={post.username}
               postImage={post.postImage}
               message={post.message}
-              onDismiss={handlePostDismiss}
+              currentUser={{
+                username:username, // Asegúrate de tener esta información disponible
+                profileImage:profileImage // Asegúrate de tener esta información disponible
+              }}
             />
+
           </div>
         ))}
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
@@ -265,19 +247,23 @@ const App = () => {
         ))}
         {isLoadingChats && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más chats...</p>}
       </div>
-      {activeChat && (
-        <Messages
+      <div style={{ display: isModalOpen ? 'block' : 'none' }}>
+        <Modal isOpen={isModalOpen} onClose={closeModal} onSubmit={handleSubmit} />
+      </div>
+      <div style={{ display: activeChat ? 'block' : 'none', height: '100%' }}>
+        {activeChat &&<Messages
+          chatId={activeChat.id}
           avatar={activeChat.avatar}
           username={activeChat.username}
           message={activeChat.message}
+          myUser={username}
           onBack={handleBackToChats}
-        />
-      )}
-      {showGameLibrary && (
-        <GameLibrary />
-      )}
-      
-      <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat ) ? 'none' : 'flex' }}>
+        />}
+      </div>
+      <div style={{ display: showGameLibrary ? 'block' : 'none', height: '100%' }}>
+        {showGameLibrary && <GameLibrary />}
+      </div>
+      <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat) ? 'none' : 'flex' }}>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={home} className="text-3xl" />
         </button>

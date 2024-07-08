@@ -1,6 +1,29 @@
-// firebaseFunctions.js
-import { ref, get, set } from "firebase/database";
+import {set, ref, push, get, onValue } from "firebase/database";
 import { database } from './firebaseConfig';
+
+// Función para almacenar un mensaje
+export const saveMessage = async (chatId, message) => {
+  try {
+    const messagesRef = ref(database, `chats/${chatId}/messages`);
+    await push(messagesRef, message);
+  } catch (error) {
+    throw new Error('Error al guardar el mensaje: ' + error.message);
+  }
+};
+
+// Función para cargar mensajes
+export const loadMessages = (chatId, callback) => {
+  try {
+    const messagesRef = ref(database, `chats/${chatId}/messages`);
+    onValue(messagesRef, (snapshot) => {
+      const messages = snapshot.val();
+      const messagesArray = messages ? Object.keys(messages).map(key => ({ id: key, ...messages[key] })) : [];
+      callback(messagesArray);
+    });
+  } catch (error) {
+    throw new Error('Error al cargar los mensajes: ' + error.message);
+  }
+};
 
 // Función para iniciar sesión
 export const signInWithEmailAndPassword = (username, password) => {
@@ -62,3 +85,83 @@ export const getProfileImageByUsername = (username) => {
       throw error;
     });
 };
+
+// Función para buscar chats por nombre de usuario
+export const findChatsByUsername = (username, onChatsUpdate) => {
+  console.log("yo soy",username)
+  try {
+    const chatsRef = ref(database, 'chats');
+
+    onValue(chatsRef, (snapshot) => {
+      const chats = snapshot.val();
+      const userChats = [];
+
+      for (const chatId in chats) {
+        const chat = chats[chatId];
+        console.log("usuario1:",chat.participants.user1.username)
+        console.log("usuario2:",chat.participants.user2.username)
+        if (chat.participants.user1.username === username || chat.participants.user2.username === username) {
+          const otherUser = chat.participants.user1.username === username ? chat.participants.user2 : chat.participants.user1;
+          userChats.push({
+            id: chatId,
+            avatar: otherUser.profileImage,
+            username: otherUser.username,
+            message: chat.messages ? Object.values(chat.messages).pop().text : '', // Último mensaje
+          });
+        }
+      }
+
+      onChatsUpdate(userChats); // Llamar la función de actualización con los nuevos chats
+    });
+  } catch (error) {
+    throw new Error('Error al buscar los chats: ' + error.message);
+  }
+};
+
+// Función para crear un chat entre dos usuarios
+// Función para crear un chat entre dos usuarios, verificando si ya existe
+export const createChatBetweenUsers = async (user1, user2) => {
+  try {
+    // Buscar todos los chats
+    const chatsRef = ref(database, 'chats');
+    const snapshot = await get(chatsRef);
+    const chats = snapshot.val();
+
+    // Verificar si ya existe un chat entre estos dos usuarios
+    for (const chatId in chats) {
+      const chat = chats[chatId];
+      if (
+        (chat.participants.user1.username === user1.username &&
+          chat.participants.user2.username === user2.username) ||
+        (chat.participants.user1.username === user2.username &&
+          chat.participants.user2.username === user1.username)
+      ) {
+        // Si ya existe, retornar el ID del chat existente
+        return chatId;
+      }
+    }
+
+    // Si no existe, crear un nuevo chat
+    const newChatRef = push(chatsRef);
+    const newChatKey = newChatRef.key;
+
+    await set(newChatRef, {
+      participants: {
+        user1: {
+          username: user1.username,
+          profileImage: user1.profileImage,
+        },
+        user2: {
+          username: user2.username,
+          profileImage: user2.profileImage,
+        }
+      },
+      messages: {}
+    });
+
+    return newChatKey;
+  } catch (error) {
+    throw new Error('Error al crear o encontrar el chat: ' + error.message);
+  }
+};
+
