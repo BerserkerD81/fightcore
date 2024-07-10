@@ -165,3 +165,32 @@ export const createChatBetweenUsers = async (user1, user2) => {
   }
 };
 
+export const subirPublicacion = async(cuerpo, imagen) => {
+  try {
+    const user = localStorage.getItem('username')
+    const date = new Date().toLocaleDateString('es-ES',{
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    });
+    
+    const newPostRef = push(ref(database, 'publicaciones/'))
+    return set(newPostRef, {
+      creador: user,
+      imagen: imagen,
+      cuerpo: cuerpo,
+      fecha_creacion: date
+      //juego: juego,
+    })
+      .then(() => {
+        console.log(user+" "+imagen+" "+cuerpo)
+        return ;
+      })
+      .catch((error) => {
+        console.log(user+" "+imagen+" "+cuerpo)
+        throw error;
+      });
+  } catch (error) {
+    throw new Error('Error al crear publicacion: ' + error.message);
+  }
+};

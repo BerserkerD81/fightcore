@@ -7,7 +7,7 @@ import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle';
-import GameLibrary from './components/partials/GameLibrary';
+import GameLibrary from './components/partials/gameLibrary';
 import { findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
