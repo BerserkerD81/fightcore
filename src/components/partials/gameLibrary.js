@@ -122,13 +122,13 @@ const GameLibrary = () => {
             <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-900 text-white z-10">
               <div className="py-1">
                 <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
-                  2019
+                  2018
                 </div>
                 <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
                   2020
                 </div>
                 <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
-                  2021
+                  2023
                 </div>
               </div>
             </div>
@@ -180,7 +180,7 @@ const GameLibrary = () => {
       </div>
 
       {/* Formulario para agregar un nuevo juego */}
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <button
           type="button"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block"
@@ -189,7 +189,7 @@ const GameLibrary = () => {
           Add New Game
         </button>
         {/* Campos para agregar un juego */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <input
             type="text"
             placeholder="Cover Image URL"
@@ -231,7 +231,7 @@ const GameLibrary = () => {
             onChange={handleInputChange}
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Lista de juegos */}
       <div className="overflow-y-auto mt-8">
