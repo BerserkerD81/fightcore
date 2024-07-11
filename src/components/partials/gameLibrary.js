@@ -1,34 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { addGameToDatabase, getGamesFromDatabase } from '../firebaseFuntions';
 
 const GameLibrary = () => {
-  const [games, setGames] = useState([
-    {
-      id: 1,
-      coverImage: 'https://via.placeholder.com/150',
-      title: 'Game 1',
-      description: 'Description for Game 1',
-      console: 'PlayStation 4',
-      jhh: 2019
-    },
-    {
-      id: 2,
-      coverImage: 'https://via.placeholder.com/150',
-      title: 'Game 2',
-      description: 'Description for Game 2',
-      console: 'Xbox One',
-      jhh: 2020
-    },
-    {
-      id: 3,
-      coverImage: 'https://via.placeholder.com/150',
-      title: 'Game 3',
-      description: 'Description for Game 3',
-      console: 'Nintendo Switch',
-      jhh: 2021
-    }
-    // Agrega más juegos según sea necesario
-  ]);
-
+  const [games, setGames] = useState([]);
+  const [newGame, setNewGame] = useState({
+    coverImage: '',
+    title: '',
+    description: '',
+    console: '',
+    jhh: ''
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [jhhFilterOpen, setjhhFilterOpen] = useState(false);
   const [consoleFilterOpen, setConsoleFilterOpen] = useState(false);
@@ -36,6 +17,14 @@ const GameLibrary = () => {
     jhh: '',
     console: ''
   });
+
+  useEffect(() => {
+    const fetchGames = async () => {
+      const gamesFromDB = await getGamesFromDatabase();
+      setGames(gamesFromDB);
+    };
+    fetchGames();
+  }, []);
 
   const togglejhhFilter = () => {
     setjhhFilterOpen(!jhhFilterOpen);
@@ -57,6 +46,28 @@ const GameLibrary = () => {
     setConsoleFilterOpen(false);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewGame({ ...newGame, [name]: value });
+  };
+
+  const handleAddGame = async () => {
+    try {
+      await addGameToDatabase(newGame);
+      const gamesFromDB = await getGamesFromDatabase();
+      setGames(gamesFromDB);
+      setNewGame({
+        coverImage: '',
+        title: '',
+        description: '',
+        console: '',
+        jhh: ''
+      });
+    } catch (error) {
+      console.error("Error adding game: ", error);
+    }
+  };
+
   // Función para filtrar los juegos según el término de búsqueda y los filtros seleccionados
   const filteredGames = games.filter((game) => {
     return (
@@ -67,7 +78,7 @@ const GameLibrary = () => {
   });
 
   return (
-    <div className="text-center h-screen flex flex-col justify-start">
+    <div className="container text-center h-screen flex flex-col justify-start">
       <h2 className="text-2xl font-bold mt-4">Game Library</h2>
 
       {/* Barra de búsqueda */}
@@ -80,19 +91,19 @@ const GameLibrary = () => {
       />
 
       {/* Filtros desplegables */}
-      <div className="flex justify-center">
+      <div className="flex justify-center space-x-4">
         {/* Menú desplegable para años */}
-        <div className="relative ml-4">
-          <div className="content-custom border border-white rounded-md">
+        <div className="relative">
+          <div className="border rounded-md">
             <button
               type="button"
-              className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 content-custom text-sm font-medium text-white hover:content-custom focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
               onClick={togglejhhFilter}
             >
-              jhh {selectedFilters.jhh && `: ${selectedFilters.jhh}`}
+              {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
               {/* Icono de flecha abajo */}
               <svg
-                className="-mr-1 ml-2 h-5 w-5 text-white"
+                className="h-5 w-5 text-white ml-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -108,15 +119,15 @@ const GameLibrary = () => {
           </div>
           {/* Contenido del filtro de años */}
           {jhhFilterOpen && (
-            <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg content-custom border border-white ring-1 ring-white ring-opacity-5 z-10">
-              <div className="py-2" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                <div className="px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem" onClick={() => handleFilterSelect('jhh', '2019')}>
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-900 text-white z-10">
+              <div className="py-1">
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
                   2019
                 </div>
-                <div className="px-4 py-2 text-sm text-white hover:content-custom" role="menuitem" onClick={() => handleFilterSelect('jhh', '2020')}>
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
                   2020
                 </div>
-                <div className="px-4 py-2 text-sm text-white hover:content-custom" role="menuitem" onClick={() => handleFilterSelect('jhh', '2021')}>
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
                   2021
                 </div>
               </div>
@@ -125,17 +136,17 @@ const GameLibrary = () => {
         </div>
 
         {/* Menú desplegable para consolas */}
-        <div className="relative ml-4">
-          <div className="content-custom border border-white rounded-md">
+        <div className="relative">
+          <div className="border rounded-md">
             <button
               type="button"
-              className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 content-custom text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
               onClick={toggleConsoleFilter}
             >
-              Console {selectedFilters.console && `: ${selectedFilters.console}`}
+              {selectedFilters.console ? `Console: ${selectedFilters.console}` : 'Console'}
               {/* Icono de flecha abajo */}
               <svg
-                className="-mr-1 ml-2 h-5 w-5 text-white"
+                className="h-5 w-5 text-white ml-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -151,15 +162,15 @@ const GameLibrary = () => {
           </div>
           {/* Contenido del filtro de consolas */}
           {consoleFilterOpen && (
-            <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg content-custom border border-white ring-1 ring-white ring-opacity-5 z-10">
-              <div className="py-2" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                <div className="px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-900 text-white z-10">
+              <div className="py-1">
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
                   PlayStation 4
                 </div>
-                <div className="px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem" onClick={() => handleFilterSelect('console', 'Xbox One')}>
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'Xbox One')}>
                   Xbox One
                 </div>
-                <div className="px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem" onClick={() => handleFilterSelect('console', 'Nintendo Switch')}>
+                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'Nintendo Switch')}>
                   Nintendo Switch
                 </div>
               </div>
@@ -168,21 +179,72 @@ const GameLibrary = () => {
         </div>
       </div>
 
-      {/* Lista de juegos filtrados */}
-      <div className="flex justify-center mt-8">
-        <div className="max-w-md overflow-x-auto whitespace-nowrap">
-          {filteredGames.map(game => (
-            <div key={game.id} className="inline-block p-4 mb-8" style={{ minHeight: '300px' }}>
-              <img
-                src={game.coverImage}
-                alt={game.title}
-                className="mx-auto rounded-lg"
-                style={{ width: '150px', height: '150px' }}
-              />
-              <div className="text-center">
-                <h3 className="text-lg font-bold mt-2">{game.title}</h3>
-                <p className="text-sm text-gray-600 mt-2">{game.description}</p>
-                <p className="text-sm text-gray-600 mt-2">{game.console} - {game.jhh}</p>
+      {/* Formulario para agregar un nuevo juego */}
+      <div className="mt-8">
+        <button
+          type="button"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block"
+          onClick={handleAddGame}
+        >
+          Add New Game
+        </button>
+        {/* Campos para agregar un juego */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <input
+            type="text"
+            placeholder="Cover Image URL"
+            name="coverImage"
+            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+            value={newGame.coverImage}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            placeholder="Title"
+            name="title"
+            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+            value={newGame.title}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            name="description"
+            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+            value={newGame.description}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            placeholder="Console"
+            name="console"
+            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+            value={newGame.console}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            placeholder="Year"
+            name="jhh"
+            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+            value={newGame.jhh}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+
+      {/* Lista de juegos */}
+      <div className="overflow-y-auto mt-8">
+        <h3 className="text-xl font-bold mb-4">Games</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {filteredGames.map((game) => (
+            <div key={game.id} className="bg-white rounded-lg overflow-hidden shadow-md h-96">
+              <img src={game.coverImage} alt={game.title} className="w-full h-40 object-cover" />
+              <div className="p-4">
+                <h4 className="font-bold text-lg">{game.title}</h4>
+                <p className="text-gray-600">{game.description}</p>
+                <p className="mt-2">Console: {game.console}</p>
+                <p>Year: {game.jhh}</p>
               </div>
             </div>
           ))}
@@ -193,3 +255,4 @@ const GameLibrary = () => {
 };
 
 export default GameLibrary;
+

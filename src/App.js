@@ -7,7 +7,8 @@ import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle'; // Asumiendo que es el componente de inicio de sesión de Google
-import GameLibrary from './components/partials/GameLibrary';
+import GameLibrary from './components/partials/gameLibrary';
+import ProfilePage from './components/partials/ProfilePage'; 
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -77,6 +78,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para el estado de inicio de sesión
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState('');
+
   useEffect(() => {
     // Check local storage for login status
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
@@ -87,7 +89,7 @@ const App = () => {
       setProfileImage(storedProfileImage);
       console.log("user:",storedUsername);
       console.log('Imagen de perfil:', profileImage);
-      setIsLoggedIn(true);;
+      setIsLoggedIn(true);
     }
 
     const handleScroll = () => {
@@ -228,15 +230,18 @@ const App = () => {
     alert(localStorage.getItem('username'))
   };
   
-
-
+  const [showProfile, setShowProfile] = useState(false); // Estado para controlar la visibilidad de ProfilePage
+  const toggleProfile = () => {
+    setShowProfile(prev => !prev); // Alternar visibilidad de ProfilePage
+  };
+  
   if (!isLoggedIn) {
     return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile) ? 'block' : 'none' }}>
         {posts.map((post, index) => (
           <div key={post.id} style={{ marginBottom: '10px' }}>
             <Post
@@ -251,7 +256,7 @@ const App = () => {
         ))}
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
-      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile) ? 'block' : 'none' }}>
         {chats.map(chat => (
           <Chat
             key={chat.id}
@@ -276,8 +281,15 @@ const App = () => {
       {showGameLibrary && (
         <GameLibrary />
       )}
+      {showProfile && (
+        <ProfilePage
+          username={username}
+          profileImage={profileImage}
+          posts={posts}
+        />
+      )}
       
-      <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat ) ? 'none' : 'flex' }}>
+      <footer className="footer rounded-b-5xl" style={{ display: 'flex' }}>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={home} className="text-3xl" />
         </button>
@@ -290,7 +302,7 @@ const App = () => {
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleView}>
           <IonIcon icon={chatbubble} className="text-3xl" />
         </button>
-        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
+        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleProfile}>
           <IonIcon icon={person} className="text-3xl" />
         </button>
       </footer>
@@ -304,3 +316,4 @@ const App = () => {
 };
 
 export default App;
+

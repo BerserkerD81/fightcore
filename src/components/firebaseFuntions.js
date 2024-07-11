@@ -1,6 +1,7 @@
 // firebaseFunctions.js
 import { ref, get, set } from "firebase/database";
-import { database } from './firebaseConfig';
+import { database } from '../firebaseConfig';
+import { push } from "firebase/database";
 
 // Función para iniciar sesión
 export const signInWithEmailAndPassword = (username, password) => {
@@ -61,4 +62,33 @@ export const getProfileImageByUsername = (username) => {
     .catch((error) => {
       throw error;
     });
-};
+
+  };
+
+
+    // Función para añadir un juego a la base de datos
+    export const addGameToDatabase = async (game) => {
+      try {
+        const gamesRef = ref(database, 'games'); // Referencia a la colección 'games'
+        await push(gamesRef, game); // Añade el juego a la colección
+      } catch (error) {
+        console.error("Error adding game to database: ", error);
+        throw error; // Lanza el error para manejarlo en el componente
+      }
+    };
+    
+    // Función para obtener los juegos desde la base de datos
+    export const getGamesFromDatabase = async () => {
+      try {
+        const gamesRef = ref(database, 'games');
+        const snapshot = await get(gamesRef);
+        if (snapshot.exists()) {
+          return Object.values(snapshot.val()); // Convierte los juegos en un array
+        } else {
+          return []; // Retorna un array vacío si no hay juegos
+        }
+      } catch (error) {
+        console.error("Error fetching games from database: ", error);
+        throw error; // Lanza el error para manejarlo en el componente
+      }
+    };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IonIcon } from '@ionic/react';
 import { camera } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { signInWithEmailAndPassword, registerWithEmailAndPassword } from '../../firebaseFuntions';
+import { signInWithEmailAndPassword, registerWithEmailAndPassword } from '../firebaseFuntions';
 
 const LoginGoogle = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
