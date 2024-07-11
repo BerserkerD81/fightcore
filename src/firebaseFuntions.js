@@ -1,5 +1,6 @@
-import {set, ref, push, get, onValue } from "firebase/database";
+import {set, ref, push, get, onValue,query, orderByChild, limitToLast, startAt } from "firebase/database";
 import { database } from './firebaseConfig';
+
 
 // Función para almacenar un mensaje
 export const saveMessage = async (chatId, message) => {
@@ -192,5 +193,35 @@ export const subirPublicacion = async(cuerpo, imagen) => {
       });
   } catch (error) {
     throw new Error('Error al crear publicacion: ' + error.message);
+  }
+};
+
+export const getPosts = async (limitCount, startAfterTimestamp) => {
+  const publicacionesRef = ref(database, 'publicaciones');
+  
+  let q = query(publicacionesRef, orderByChild('fecha_creacion'), limitToLast(limitCount));
+
+  if (startAfterTimestamp) {
+    q = query(publicacionesRef, orderByChild('fecha_creacion'), startAt(startAfterTimestamp), limitToLast(limitCount));
+  }
+
+  const snapshot = await get(q);
+
+  if (snapshot.exists()) {
+    const posts = [];
+    snapshot.forEach(childSnapshot => {
+      const data = childSnapshot.val();
+      posts.push({
+        id: childSnapshot.key,
+        avatar: "https://via.placeholder.com/60", // Cambia esto si tienes avatares de usuarios
+        username: data.creador,
+        postImage: `data:image/jpeg;base64,${data.imagen}`,
+        message: data.cuerpo,
+        createdAt: data.fecha_creacion,
+      });
+    });
+    return posts.reverse(); // Reversing since we used limitToLast to get the most recent ones
+  } else {
+    return [];
   }
 };
