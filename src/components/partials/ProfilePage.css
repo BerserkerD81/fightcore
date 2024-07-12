@@ -45,11 +45,19 @@
     border-radius: 5px;
     margin-bottom: 20px;
   }
-  
   .button:hover {
     background-color: #0056b3;
   }
-  
+
+
+  h1 {
+    font-size: 32em; /* Tamaño del texto */
+    color: #ffffff; /* Color del texto */
+    font-family: 'Arial', sans-serif; /* Fuente del texto */
+    text-align: center; /* Centra el texto */
+    margin-top: 20px; /* Espacio superior */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra de texto */
+  }
   .logout-button {
     background-color: #dc3545;
     color: white;
@@ -57,6 +65,8 @@
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 5px;
+    display: block;
+    margin: 0 auto;
   }
   
   .logout-button:hover {

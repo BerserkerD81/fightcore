@@ -41,11 +41,13 @@ const App = () => {
   const [showProfile, setShowProfile] = useState(false);
 
   const reloadPage = () => {
-    // Reinicia los estados a su estado inicial
     setPosts([]);
     setIsLoadingPosts(false);
     setShowPosts(true);
-    // Aquí puedes agregar más reinicios según sea necesario
+    setIsModalOpen(false);
+    setShowGameLibrary(false);
+    setActiveChat(false)
+    setShowProfile(false)
   };
     
 
@@ -91,15 +93,33 @@ const App = () => {
     }
   }, [username]);
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = () =>{
+    setIsLoadingChats(false);
+    setShowGameLibrary(false);
+    setActiveChat(false)
+    setShowProfile(false) 
+    setShowPosts(false)
+    setIsModalOpen(true);
+    
+  } 
   const closeModal = () => setIsModalOpen(false);
 
   const toggleGameLibrary = () => {
-    setShowGameLibrary((prev) => !prev);
+    setIsLoadingChats(false);
+    setIsModalOpen(false);
+    setShowPosts(false);
+    setActiveChat(false);
+    setShowProfile(false);
+    setShowGameLibrary(true);
   };
 
   const toggleProfile = () => {
-    setShowProfile((prev) => !prev);
+    setIsLoadingChats(false);
+    setIsModalOpen(false);
+    setShowGameLibrary(false);
+    setActiveChat(false)
+    setShowPosts(false)
+    setShowProfile(true);
   };
 
   const handleSubmit = (e, body, selectedImage) => {
@@ -180,8 +200,15 @@ const App = () => {
   };
 
   const toggleView = () => {
-    setShowPosts((prev) => !prev);
+    setShowPosts(false);
+    setIsLoadingChats(true);
+    setIsModalOpen(false);
+    setShowGameLibrary(false);
+    setShowProfile(false)
+    setIsLoadingChats(false);
   };
+
+  
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -209,7 +236,7 @@ const App = () => {
           padding: '1rem',
           backgroundColor: '#191919',
           overflowY: 'auto',
-          display: showPosts && !isModalOpen && !activeChat && !showGameLibrary ? 'block' : 'none',
+          display:!isLoadingChats && showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile ? 'block' : 'none',
         }}
       >
         {uniquePosts.map((post) => (
@@ -237,7 +264,7 @@ const App = () => {
           padding: '1rem',
           backgroundColor: '#191919',
           overflowY: 'auto',
-          display: !showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile ? 'block' : 'none',
+          display: !isLoadingChats && !showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile ? 'block' : 'none',
         }}
       >
         {chats.map((chat) => (
@@ -251,7 +278,7 @@ const App = () => {
             onChatClick={handleChatClick}
           />
         ))}
-        {isLoadingChats && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más chats...</p>}
+        {isLoadingChats && !showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más chats...</p>}
       </div>
       <div style={{ display: isModalOpen ? 'block' : 'none' }}>
         <Modal isOpen={isModalOpen} onClose={closeModal} onSubmit={handleSubmit} />
@@ -269,10 +296,10 @@ const App = () => {
         )}
       </div>
       <div style={{ display: showGameLibrary ? 'block' : 'none', height: '100%' }}>
-        {showGameLibrary && <GameLibrary />}
+        {!showProfile && !showPosts && !isModalOpen && !activeChat && showGameLibrary &&<GameLibrary />}
       </div>
       <div style={{ display: showProfile ? 'block' : 'none', height: '100%' }}>
-        {showProfile && <ProfilePage />}
+        {showProfile && !showPosts && !isModalOpen && !activeChat && !showGameLibrary && <ProfilePage />}
       </div>
       <footer
         className="footer rounded-b-5xl"
