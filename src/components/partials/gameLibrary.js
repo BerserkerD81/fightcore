@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { addGameToDatabase, getGamesFromDatabase } from '../firebaseFuntions';
+import { mostrarJuegos } from '../../firebaseFuntions';
 
 const GameLibrary = () => {
   const [games, setGames] = useState([]);
@@ -37,6 +38,7 @@ const GameLibrary = () => {
   };
 
   const handleFilterSelect = (type, value) => {
+    console.log("TIPO: "+type+" "+value)
     setSelectedFilters({
       ...selectedFilters,
       [type]: value
@@ -68,14 +70,22 @@ const GameLibrary = () => {
     }
   };
 
+  const handleGames = async () => {
+    const filterGames = await mostrarJuegos();
+    setGames(filterGames);
+  }
+  
   // Función para filtrar los juegos según el término de búsqueda y los filtros seleccionados
   const filteredGames = games.filter((game) => {
     return (
       game.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedFilters.jhh === '' || game.jhh === parseInt(selectedFilters.jhh)) &&
+      (selectedFilters.jhh === '' || game.jhh === selectedFilters.jhh) &&
       (selectedFilters.console === '' || game.console === selectedFilters.console)
     );
   });
+
+  const uniqueYears = [...new Set(games.map(option => option.jhh))];
+  const uniqueConsole = [...new Set(games.map(option => option.console))];
 
   return (
     <div className="container mx-auto p-4">
@@ -94,80 +104,33 @@ const GameLibrary = () => {
       <div className="flex justify-center space-x-4 mb-4">
         {/* Menú desplegable para años */}
         <div className="relative">
-  <button
-    type="button"
-    className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
-    onClick={togglejhhFilter}
-  >
-    {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
-    <svg
-      className="h-5 w-5 text-white ml-2"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        fillRule="evenodd"
-        d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
-        clipRule="evenodd"
-      />
-    </svg>
-  </button>
-  {jhhFilterOpen && (
-    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black border border-gray-300 z-10 text-align:right">
-      <div className="py-1">
-        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
-          <div className="text-right">2019</div>
-        </div>
-        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
-          <div className="text-right">2020</div>
-        </div>
-        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
-          <div className="text-right">2021</div>
-        </div>
+        <select
+          className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
+          value={selectedFilters.jhh}
+          onChange={(e) => handleFilterSelect('jhh', e.target.value)}
+        >
+          <option value="">Año de salida</option>
+            {uniqueYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+          </option>
+          ))}
+        </select>
       </div>
-    </div>
-  )}
-</div>
-
         {/* Menú desplegable para consolas */}
         <div className="relative">
-          <button
-            type="button"
-            className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
-            onClick={toggleConsoleFilter}
-          >
-            {selectedFilters.console ? `Console: ${selectedFilters.console}` : 'Console'}
-            <svg
-              className="h-5 w-5 text-white ml-2"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-          {consoleFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black border border-gray-300 z-10">
-              <div className="py-1">
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
-                  PlayStation 4
-                </div>
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'Xbox One')}>
-                  Xbox One
-                </div>
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'Nintendo Switch')}>
-                  Nintendo Switch
-                </div>
-              </div>
-            </div>
-          )}
+        <select
+          className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
+          value={selectedFilters.console}
+          onChange={(e) => handleFilterSelect('console', e.target.value)}
+        >
+          <option value="">Consola</option>
+          {uniqueConsole.map((console) => (
+            <option key={console} value={console}>
+              {console}
+            </option>
+          ))}
+        </select>
         </div>
       </div>
 
