@@ -9,8 +9,6 @@ import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle'; // Asumiendo que es el componente de inicio de sesión de Google
 import GameLibrary from './components/partials/gameLibrary';
 import ProfilePage from './components/partials/ProfilePage'; 
-import LoginGoogle from './components/partials/LoginGoogle';
-import GameLibrary from './components/partials/gameLibrary';
 import {getPosts, findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
