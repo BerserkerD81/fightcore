@@ -4,7 +4,7 @@ import { createChatBetweenUsers, getProfileImageByUsername } from '../../firebas
 
 const challengeImage = "https://oyster.ignimgs.com/mediawiki/apis.ign.com/street-fighter-x-tekken/8/8f/Punch.png?width=325";
 
-const Post = ({ avatar, username, postImage, message, currentUser }) => {
+const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => {
   const [chatPartnerAvatar, setChatPartnerAvatar] = useState(avatar);
 
   useEffect(() => {
@@ -65,6 +65,7 @@ const Post = ({ avatar, username, postImage, message, currentUser }) => {
           style={{ objectFit: 'cover', width: '60px', height: '60px' }}
         />
         <h3 className="text-lg font-semibold">{username}</h3>
+        <h3 className="text-lg font-semibold">{game}</h3>
       </div>
       <div className="mb-4">
         <p>{message}</p>

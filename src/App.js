@@ -32,6 +32,7 @@ const App = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   const [showPosts, setShowPosts] = useState(true);
   const [activeChat, setActiveChat] = useState(null);
+  const [reloadPost, setReload] = useState(null);
   const containerRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -52,11 +53,11 @@ const App = () => {
     const handleScroll = () => {
       if (
         containerRef.current &&
-        containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight
+        containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight - 100 // Margen de 100px antes del final
       ) {
-        if (showPosts) {
+        if (showPosts && !isLoadingPosts) {
           loadMorePosts();
-        } else {
+        } else if (!showPosts && !isLoadingChats) {
           loadMoreChats();
         }
       }
@@ -116,7 +117,7 @@ const App = () => {
   };
 
   async function generateRandomPost() {
-    let newPost = await getPosts()
+    let newPost = await getPosts(posts)
 
     return newPost;
   };
@@ -138,20 +139,18 @@ const App = () => {
     };
   };
 
- const loadMorePosts = () => {
-      if (!isLoadingPosts) {
+  const loadMorePosts = () => {
+    if (!isLoadingPosts) {
       setIsLoadingPosts(true);
       setTimeout(async () => {
-        let newPosts = await generateRandomPost()
-        const test = [];
-        for (let i = 0; i < newPosts.length; i++) {
-          test.push(newPosts[i]);
-        }
-        setPosts(prevPosts => [...prevPosts, ...test]);
+        let newPosts = await generateRandomPost();
+
+        setPosts(prevPosts => [...prevPosts, ...newPosts]);
         setIsLoadingPosts(false);
       }, 1000);
     }
   };
+  
 
   const loadMoreChats = () => {
     if (!isLoadingChats) {
@@ -181,26 +180,30 @@ const App = () => {
   if (!isLoggedIn) {
     return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
   }
+  const SetreloadPost = () => {
+    setReload();
+  }
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
-        {posts.map((post, index) => (
-          <div key={post.id} style={{ marginBottom: '10px' }}>
+      {posts.map(post => (
+  <div key={post.id} style={{ marginBottom: '10px' }}>
+    <Post
+      id={post.id}
+      avatar={post.avatar}
+      username={post.username}
+      postImage={post.postImage}
+      message={post.message}
+      game={post.game}
+      currentUser={{
+        username: username,
+        profileImage: profileImage
+      }}
+    />
+  </div>
+))}
 
-            <Post
-              avatar={post.avatar}
-              username={post.username}
-              postImage={post.postImage}
-              message={post.message}
-              currentUser={{
-                username:username, // Asegúrate de tener esta información disponible
-                profileImage:profileImage // Asegúrate de tener esta información disponible
-              }}
-            />
-
-          </div>
-        ))}
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
       <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
@@ -254,6 +257,8 @@ const App = () => {
         isModalOpen={isModalOpen}
         closeModal={closeModal}
         handleSubmit={handleSubmit}
+        reloadPost={setReload}
+        loadMorePosts={loadMorePosts}
       />
     </div>
   );
