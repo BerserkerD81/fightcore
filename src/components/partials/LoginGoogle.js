@@ -50,7 +50,6 @@ const LoginGoogle = ({ onLoginSuccess }) => {
         });
       });
   };
-
   const onRegister = () => {
     if (!profileImageBase64) {
       Swal.fire({
