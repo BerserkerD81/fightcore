@@ -38,6 +38,8 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [showGameLibrary, setShowGameLibrary] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
   const reloadPage = () => {
     setPosts([]);
     setIsLoadingPosts(false);
@@ -47,7 +49,7 @@ const App = () => {
     setActiveChat(false)
     setShowProfile(false)
   };
-    const [showProfile, setShowProfile] = useState(false);
+    
 
   useEffect(() => {
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
@@ -175,7 +177,7 @@ const App = () => {
     setIsLoadingPosts(true);
     try {
       let newPosts = await generateRandomPost();
-      setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+      setPosts(prevPosts => [...prevPosts, ...newPosts]);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
@@ -220,7 +222,7 @@ const App = () => {
 
   const SetreloadPost = () => {
     setReload();
-  };
+  }
 
   const uniquePosts = [...new Set(posts.map((post) => post.id))].map((id) => posts.find((post) => post.id === id));
 
@@ -253,6 +255,7 @@ const App = () => {
             />
           </div>
         ))}
+
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
       <div
