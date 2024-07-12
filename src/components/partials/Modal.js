@@ -160,7 +160,7 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit, setReload, loadMorePosts
                     className="w-full px-3 py-2 border-magenta rounded"
                     onClick={() => setShowGames(false)}
                   >
-                    Cancelar
+                    volver
                   </button>
                 </div>
               </div>
