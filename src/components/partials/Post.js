@@ -6,8 +6,11 @@ const challengeImage = "https://oyster.ignimgs.com/mediawiki/apis.ign.com/street
 
 const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => {
   const [chatPartnerAvatar, setChatPartnerAvatar] = useState(avatar);
-  const [sonIguales, setIguales] = useState(false);
+  const [sonIguales, setIguales] = useState(true);
   useEffect(() => {
+    if(currentUser.username === username){
+      casoIguales();
+    }
     const fetchProfileImage = async () => {
       try {
         const profileImage = await getProfileImageByUsername(username);
@@ -21,13 +24,10 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
   }, [username]);
 
   const casoIguales = () => {
-    setIguales(true)
+    setIguales(false)
   }
   const handleChallengeClick = async () => {
     try {
-      if(currentUser === username){
-        casoIguales();
-      }
       const newChatKey = await createChatBetweenUsers(
         {
           username: currentUser.username,
