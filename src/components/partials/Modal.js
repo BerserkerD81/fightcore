@@ -2,26 +2,44 @@ import React, { useState } from 'react';
 import { IonIcon } from '@ionic/react';
 import { arrowBack, camera, images, shareOutline, person, gameController } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { subirPublicacion} from '../../firebaseFuntions';
 
 const Modal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [body, setBody] = useState('');
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [image64, setImage64] = useState(null);
+
+  const base64ToImageSrc = (base64String) => {
+    return `data:image/jpeg;base64,${base64String}`;
+  };
 
   const selectImage = async (source) => {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.Uri,
+        resultType: CameraResultType.Base64,
         source: source,
       });
 
-      if (image) {
-        setSelectedImage(image.webPath);
+      if (image && image.base64String) {
+        const img2 = base64ToImageSrc(image.base64String);
+        setSelectedImage(img2);
+        setImage64(image.base64String)
       }
     } catch (error) {
       console.error('Error seleccionando la imagen:', error);
+    }
+  };
+  const uploadPublicacion = async (cuerpo, imagen) => {
+    console.log("CUERPO: "+cuerpo)
+    try {
+      await subirPublicacion(cuerpo, imagen);
+      console.log('Publicacion creada correctamente');
+
+    } catch (error) {
+      console.error('Error al crear publicacion:', error);
     }
   };
 
@@ -42,7 +60,7 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit }) => {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   className="w-full px-3 py-2 text-white bg-transparent border rounded resize-none"
-                  placeholder="¿Qué quieres hacer?"
+                  placeholder="Escribe tu publicación"
                   style={{ minHeight: '100px', borderRadius: '10px', marginTop: '8px' }}
                   required
                 />
@@ -109,7 +127,7 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit }) => {
             )}
             <button
               className="w-full px-3 py-2 text-white bg-transparent border border-turquoise rounded mt-4"
-              onClick={(e) => handleSubmit(e, body, selectedImage)}
+              onClick={(e) => uploadPublicacion(body, image64)}
             >
               Publicar
             </button>
