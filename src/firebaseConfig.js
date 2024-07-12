@@ -1,6 +1,6 @@
 // firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database"; // Asegúrate de importar el método getDatabase
+import { getDatabase } from "firebase/database"; 
 
 
 // Tu configuración de Firebase
@@ -12,6 +12,8 @@ const firebaseConfig = {
   messagingSenderId: "633866961609",
   appId: "1:633866961609:web:a2ad659b5551e129a58318"
 };
+
+
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);

@@ -7,7 +7,8 @@ import Post from './components/partials/Post';
 import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle';
-import GameLibrary from './components/partials/GameLibrary';
+import GameLibrary from './components/partials/gameLibrary';
+import ProfilePage from './components/partials/ProfilePage'; 
 import { findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -59,6 +60,7 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [showGameLibrary, setShowGameLibrary] = useState(false);
+
 
   useEffect(() => {
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
@@ -207,14 +209,19 @@ const App = () => {
     localStorage.setItem('isLoggedIn', 'true');
     setUsername(localStorage.getItem('username'));
   };
-
+  
+  const [showProfile, setShowProfile] = useState(false); // Estado para controlar la visibilidad de ProfilePage
+  const toggleProfile = () => {
+    setShowProfile(prev => !prev); // Alternar visibilidad de ProfilePage
+  };
+  
   if (!isLoggedIn) {
     return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile) ? 'block' : 'none' }}>
         {posts.map((post, index) => (
           <div key={post.id} style={{ marginBottom: '10px' }}>
 
@@ -233,7 +240,7 @@ const App = () => {
         ))}
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
-      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
+      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile) ? 'block' : 'none' }}>
         {chats.map(chat => (
           <Chat
             key={chat.id}
@@ -276,7 +283,7 @@ const App = () => {
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleView}>
           <IonIcon icon={chatbubble} className="text-3xl" />
         </button>
-        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
+        <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleProfile}>
           <IonIcon icon={person} className="text-3xl" />
         </button>
       </footer>
@@ -290,3 +297,4 @@ const App = () => {
 };
 
 export default App;
+
