@@ -2,6 +2,7 @@
 import { ref, get, set } from "firebase/database";
 import { database } from '../firebaseConfig';
 import { push } from "firebase/database";
+import { getAuth, signOut } from 'firebase/auth';
 
 // Función para iniciar sesión
 export const signInWithEmailAndPassword = (username, password) => {
@@ -139,4 +140,17 @@ export const getFavoriteGamesForProfile = async (userId) => {
     console.error("Error fetching favorite games from profile: ", error);
     throw error; // Lanza el error para manejarlo en el componente
   }
+};
+
+
+// Función para cerrar sesión
+export const logout = () => {
+  const auth = getAuth();
+  signOut(auth).then(() => {
+    // Redirección al login puede ser manejada aquí si estás usando React Router
+    // Por ejemplo: history.push('/login');
+    console.log('Sesión cerrada exitosamente');
+  }).catch((error) => {
+    console.error('Error cerrando sesión:', error);
+  });
 };
