@@ -78,57 +78,53 @@ const GameLibrary = () => {
   });
 
   return (
-    <div className="container text-center h-screen flex flex-col justify-start">
-      <h2 className="text-2xl font-bold mt-4">Game Library</h2>
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4 text-center">Game Library</h2>
 
       {/* Barra de búsqueda */}
       <input
         type="text"
         placeholder="Search by title..."
-        className="my-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
+        className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       {/* Filtros desplegables */}
-      <div className="flex justify-center space-x-4">
+      <div className="flex justify-center space-x-4 mb-4">
         {/* Menú desplegable para años */}
         <div className="relative">
-          <div className="border rounded-md">
-            <button
-              type="button"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
-              onClick={togglejhhFilter}
+          <button
+            type="button"
+            className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
+            onClick={togglejhhFilter}
+          >
+            {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
+            <svg
+              className="h-5 w-5 text-white ml-2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
             >
-              {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
-              {/* Icono de flecha abajo */}
-              <svg
-                className="h-5 w-5 text-white ml-2"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-          {/* Contenido del filtro de años */}
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
           {jhhFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-900 text-white z-10">
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-300 z-10">
               <div className="py-1">
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
-                  2018
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
+                  2019
                 </div>
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
                   2020
                 </div>
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
-                  2023
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
+                  2021
                 </div>
               </div>
             </div>
@@ -137,40 +133,36 @@ const GameLibrary = () => {
 
         {/* Menú desplegable para consolas */}
         <div className="relative">
-          <div className="border rounded-md">
-            <button
-              type="button"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
-              onClick={toggleConsoleFilter}
+          <button
+            type="button"
+            className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
+            onClick={toggleConsoleFilter}
+          >
+            {selectedFilters.console ? `Console: ${selectedFilters.console}` : 'Console'}
+            <svg
+              className="h-5 w-5 text-white ml-2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
             >
-              {selectedFilters.console ? `Console: ${selectedFilters.console}` : 'Console'}
-              {/* Icono de flecha abajo */}
-              <svg
-                className="h-5 w-5 text-white ml-2"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-          {/* Contenido del filtro de consolas */}
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
           {consoleFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-900 text-white z-10">
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-300 z-10">
               <div className="py-1">
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
                   PlayStation 4
                 </div>
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'Xbox One')}>
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'Xbox One')}>
                   Xbox One
                 </div>
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleFilterSelect('console', 'Nintendo Switch')}>
+                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'Nintendo Switch')}>
                   Nintendo Switch
                 </div>
               </div>
@@ -179,80 +171,25 @@ const GameLibrary = () => {
         </div>
       </div>
 
-      {/* Formulario para agregar un nuevo juego */}
-      {/* <div className="mt-8">
-        <button
-          type="button"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block"
-          onClick={handleAddGame}
-        >
-          Add New Game
-        </button>
-        {/* Campos para agregar un juego */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <input
-            type="text"
-            placeholder="Cover Image URL"
-            name="coverImage"
-            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
-            value={newGame.coverImage}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            placeholder="Title"
-            name="title"
-            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
-            value={newGame.title}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            name="description"
-            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
-            value={newGame.description}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            placeholder="Console"
-            name="console"
-            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
-            value={newGame.console}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            placeholder="Year"
-            name="jhh"
-            className="my-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-800"
-            value={newGame.jhh}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div> */}
-
       {/* Lista de juegos */}
-      <div className="overflow-y-auto mt-8">
-        <h3 className="text-xl font-bold mb-4">Games</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filteredGames.map((game) => (
-            <div key={game.id} className="bg-white rounded-lg overflow-hidden shadow-md h-96">
-              <img src={game.coverImage} alt={game.title} className="w-full h-40 object-cover" />
-              <div className="p-4">
-                <h4 className="font-bold text-lg">{game.title}</h4>
-                <p className="text-gray-600">{game.description}</p>
-                <p className="mt-2">Console: {game.console}</p>
-                <p>Year: {game.jhh}</p>
-              </div>
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {filteredGames.map((game) => (
+          <div key={game.id} className="bg-black rounded-lg overflow-hidden shadow-md">
+            <img src={game.coverImage} alt={game.title} className="w-full h-40 object-cover" />
+            <div className="p-4">
+              <h4 className="font-bold text-lg">{game.title}</h4>
+              <p className="text-gray-600 truncate">{game.description}</p>
+              <p className="mt-2 text-gray-800">Console: {game.console}</p>
+              <p className="text-gray-800">Year: {game.jhh}</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default GameLibrary;
+
+
 

@@ -92,3 +92,51 @@ export const getProfileImageByUsername = (username) => {
         throw error; // Lanza el error para manejarlo en el componente
       }
     };
+
+   // Función para añadir un juego a los favoritos del usuario
+export const addFavoriteGameToProfile = async (userId, gameId) => {
+  try {
+    const userRef = ref(database, 'users/' + userId + '/favorites/' + gameId);
+    await set(userRef, true); // Añade el juego a la lista de favoritos del usuario
+  } catch (error) {
+    console.error("Error adding favorite game to profile: ", error);
+    throw error; // Lanza el error para manejarlo en el componente
+  }
+};
+
+// Función para remover un juego de los favoritos del usuario
+export const removeFavoriteGameFromProfile = async (userId, gameId) => {
+  try {
+    const userRef = ref(database, 'users/' + userId + '/favorites/' + gameId);
+    await set(userRef, null); // Elimina el juego de la lista de favoritos del usuario
+  } catch (error) {
+    console.error("Error removing favorite game from profile: ", error);
+    throw error; // Lanza el error para manejarlo en el componente
+  }
+};
+
+// Función para obtener los juegos favoritos del usuario
+export const getFavoriteGamesForProfile = async (userId) => {
+  try {
+    const favoritesRef = ref(database, 'users/' + userId + '/favorites');
+    const snapshot = await get(favoritesRef);
+    if (snapshot.exists()) {
+      const favoriteGamesIds = Object.keys(snapshot.val() || {});
+      
+      // Obtener detalles de los juegos favoritos
+      const gamesDetailsPromises = favoriteGamesIds.map(async (gameId) => {
+        const gameRef = ref(database, 'games/' + gameId);
+        const gameSnapshot = await get(gameRef);
+        return gameSnapshot.exists() ? gameSnapshot.val() : null;
+      });
+      
+      const favoriteGames = await Promise.all(gamesDetailsPromises);
+      return favoriteGames.filter(game => game !== null); // Filtrar juegos que no existen
+    } else {
+      return []; // Retorna un array vacío si el usuario no tiene juegos favoritos
+    }
+  } catch (error) {
+    console.error("Error fetching favorite games from profile: ", error);
+    throw error; // Lanza el error para manejarlo en el componente
+  }
+};
