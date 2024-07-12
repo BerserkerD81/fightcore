@@ -36,11 +36,10 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit, setReload, loadMorePosts
     }
   };
 
-  const uploadPublicacion = async (cuerpo, imagen) => {
+  const uploadPublicacion = async (cuerpo, imagen,juego) => {
     console.log("CUERPO: " + cuerpo)
     try {
-      await subirPublicacion(cuerpo, imagen);
-      console.log('Publicacion creada correctamente');
+      await subirPublicacion(cuerpo, imagen,juego);
     } catch (error) {
       console.error('Error al crear publicacion:', error);
     }
@@ -61,6 +60,10 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit, setReload, loadMorePosts
     setGames(games);
     setShowGames(true);
   }
+  const handleChange = (event) => {
+    console.log("GAME: "+event.target.value)
+    setSelectedGame(event.target.value);
+  };
 
   return (
     isModalOpen && (
@@ -143,21 +146,16 @@ const Modal = ({ isModalOpen, closeModal, handleSubmit, setReload, loadMorePosts
             {showGames && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="content-custom bg-opacity-100 rounded-lg w-full md:w-2/3 lg:w-1/2 xl:w-1/3 p-4">
-                  <select
-                    className="w-full px-3 py-2 mb-4 border-magenta rounded"
-                    onChange={(e) => {
-                      const selectedOption = games.find(option => option.id === parseInt(e.target.value));
-                      setSelectedGame(selectedOption);
-                      setShowGames(false);
-                    }}
-                  >
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    {games.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.title}
-                      </option>
-                    ))}
-                  </select>
+                <select className="w-full px-3 py-2 mb-4 border-magenta rounded" value={selectedGame} onChange={handleChange}>
+                  <option value="" disabled selected>
+                    Seleccione una opción
+                  </option>
+                  {games.map((option) => (
+                    <option key={option.title} value={option.title}>
+                      {option.title}
+                    </option>
+                  ))}
+                </select>
                   <button
                     className="w-full px-3 py-2 border-magenta rounded"
                     onClick={() => setShowGames(false)}

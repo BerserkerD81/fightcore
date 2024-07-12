@@ -6,7 +6,7 @@ const challengeImage = "https://oyster.ignimgs.com/mediawiki/apis.ign.com/street
 
 const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => {
   const [chatPartnerAvatar, setChatPartnerAvatar] = useState(avatar);
-
+  const [sonIguales, setIguales] = useState(false);
   useEffect(() => {
     const fetchProfileImage = async () => {
       try {
@@ -20,8 +20,14 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
     fetchProfileImage();
   }, [username]);
 
+  const casoIguales = () => {
+    setIguales(true)
+  }
   const handleChallengeClick = async () => {
     try {
+      if(currentUser === username){
+        casoIguales();
+      }
       const newChatKey = await createChatBetweenUsers(
         {
           username: currentUser.username,
@@ -65,8 +71,8 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
           style={{ objectFit: 'cover', width: '60px', height: '60px' }}
         />
         <h3 className="text-lg font-semibold">{username}</h3>
-        <h3 className="text-lg font-semibold">{game}</h3>
       </div>
+      <h4 className="text-lg font-semibold">{game}</h4>
       <div className="mb-4">
         <p>{message}</p>
       </div>
@@ -79,6 +85,7 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
             style={{ maxWidth: '100%', height: 'auto' }}
           />
           <div className="absolute bottom-5 right-5">
+            {sonIguales && 
             <div className="border-gradient-fight flex justify-center items-center">
               <img
                 src={challengeImage}
@@ -88,6 +95,8 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
                 style={{ width: '60px', height: '60px', zIndex: '10', marginLeft: '-2px', marginTop: '-2px' }}
               />
             </div>
+            }
+            
           </div>
         </div>
       )}

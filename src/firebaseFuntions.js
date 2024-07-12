@@ -178,8 +178,11 @@ export const subirPublicacion = async(cuerpo, imagen,juego) => {
       month: '2-digit',
       year: '2-digit'
     });
-    
+    console.log(juego)
     const newPostRef = push(ref(database, 'publicaciones/'))
+    if(juego === null){
+      juego = "Sin Especificar"
+    }
     return set(newPostRef, {
       creador: user,
       imagen: imagen,
@@ -219,6 +222,7 @@ export const getPosts = async (posts) => {
           postImage: `data:image/jpeg;base64,${data.imagen}`,
           message: data.cuerpo,
           createdAt: data.fecha_creacion,
+          game: data.game
         });
       } else {
         console.warn(`El post con ID ${childSnapshot.key} ya existe en la lista de posts.`);
