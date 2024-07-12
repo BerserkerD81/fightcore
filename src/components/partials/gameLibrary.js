@@ -94,42 +94,42 @@ const GameLibrary = () => {
       <div className="flex justify-center space-x-4 mb-4">
         {/* Menú desplegable para años */}
         <div className="relative">
-          <button
-            type="button"
-            className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
-            onClick={togglejhhFilter}
-          >
-            {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
-            <svg
-              className="h-5 w-5 text-white ml-2"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-          {jhhFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-300 z-10">
-              <div className="py-1">
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
-                  2019
-                </div>
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
-                  2020
-                </div>
-                <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
-                  2021
-                </div>
-              </div>
-            </div>
-          )}
+  <button
+    type="button"
+    className="w-full px-4 py-2 bg-gray-800 text-white rounded-md flex items-center justify-between"
+    onClick={togglejhhFilter}
+  >
+    {selectedFilters.jhh ? `Year: ${selectedFilters.jhh}` : 'Year'}
+    <svg
+      className="h-5 w-5 text-white ml-2"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 3a1 1 0 011 1v10a1 1 0 01-1.447.895l-4-2a1 1 0 010-1.79l4-2A1 1 0 0110 3zm1 10a1 1 0 01-1 1H6a1 1 0 110-2h4a1 1 0 011 1zm-1-4a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1z"
+        clipRule="evenodd"
+      />
+    </svg>
+  </button>
+  {jhhFilterOpen && (
+    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black border border-gray-300 z-10 text-align:right">
+      <div className="py-1">
+        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2019')}>
+          <div className="text-right">2019</div>
         </div>
+        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2020')}>
+          <div className="text-right">2020</div>
+        </div>
+        <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('jhh', '2021')}>
+          <div className="text-right">2021</div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
 
         {/* Menú desplegable para consolas */}
         <div className="relative">
@@ -154,7 +154,7 @@ const GameLibrary = () => {
             </svg>
           </button>
           {consoleFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-300 z-10">
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black border border-gray-300 z-10">
               <div className="py-1">
                 <div className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleFilterSelect('console', 'PlayStation 4')}>
                   PlayStation 4

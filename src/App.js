@@ -38,7 +38,14 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [showGameLibrary, setShowGameLibrary] = useState(false);
-
+  const reloadPage = () => {
+    // Reinicia los estados a su estado inicial
+    setPosts([]);
+    setIsLoadingPosts(false);
+    setShowPosts(true);
+    // Aquí puedes agregar más reinicios según sea necesario
+  };
+  
   useEffect(() => {
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
     if (storedLoginStatus === 'true') {
@@ -189,25 +196,37 @@ const App = () => {
     setReload();
   }
 
+  const uniquePosts = [...new Set(posts.map((post) => post.id))].map((id) => posts.find((post) => post.id === id));
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div ref={containerRef} style={{ marginTop: '10px', flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (showPosts && !isModalOpen && !activeChat && !showGameLibrary) ? 'block' : 'none' }}>
-      {posts.map(post => (
-  <div key={post.id} style={{ marginBottom: '10px' }}>
-    <Post
-      id={post.id}
-      avatar={post.avatar}
-      username={post.username}
-      postImage={post.postImage}
-      message={post.message}
-      game={post.game}
-      currentUser={{
-        username: username,
-        profileImage: profileImage
-      }}
-    />
-  </div>
-))}
+      <div
+        ref={containerRef}
+        style={{
+          marginTop: '10px',
+          flex: 1,
+          padding: '1rem',
+          backgroundColor: '#191919',
+          overflowY: 'auto',
+          display: showPosts && !isModalOpen && !activeChat && !showGameLibrary ? 'block' : 'none',
+        }}
+      >
+        {uniquePosts.map((post) => (
+          <div key={post.id} style={{ marginBottom: '10px' }}>
+            <Post
+              id={post.id}
+              avatar={post.avatar}
+              username={post.username}
+              postImage={post.postImage}
+              message={post.message}
+              game={post.game}
+              currentUser={{
+                username: username,
+                profileImage: profileImage,
+              }}
+            />
+          </div>
+        ))}
 
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
@@ -243,7 +262,7 @@ const App = () => {
       </div>
       <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat) ? 'none' : 'flex' }}>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
-          <IonIcon icon={home} className="text-3xl" />
+          <IonIcon icon={home} className="text-3xl" onClick={reloadPage} />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={search} onClick={toggleGameLibrary} className="text-3xl" />
