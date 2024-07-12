@@ -8,8 +8,8 @@ import Chat from './components/partials/Chat';
 import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle';
 import GameLibrary from './components/partials/gameLibrary';
-import ProfilePage from './components/partials/ProfilePage'; 
-import {getPosts, findChatsByUsername } from './firebaseFuntions';
+import ProfilePage from './components/partials/ProfilePage';
+import { getPosts, findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -45,7 +45,8 @@ const App = () => {
     setShowPosts(true);
     // Aquí puedes agregar más reinicios según sea necesario
   };
-  
+    const [showProfile, setShowProfile] = useState(false);
+
   useEffect(() => {
     const storedLoginStatus = localStorage.getItem('isLoggedIn');
     if (storedLoginStatus === 'true') {
@@ -60,7 +61,7 @@ const App = () => {
     const handleScroll = () => {
       if (
         containerRef.current &&
-        containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight - 100 // Margen de 100px antes del final
+        containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight - 100
       ) {
         if (showPosts && !isLoadingPosts) {
           loadMorePosts();
@@ -83,7 +84,7 @@ const App = () => {
 
   useEffect(() => {
     if (username) {
-      console.log("username:", username);
+      console.log('username:', username);
       findChatsByUsername(username, setChats);
     }
   }, [username]);
@@ -92,7 +93,11 @@ const App = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const toggleGameLibrary = () => {
-    setShowGameLibrary(prev => !prev);
+    setShowGameLibrary((prev) => !prev);
+  };
+
+  const toggleProfile = () => {
+    setShowProfile((prev) => !prev);
   };
 
   const handleSubmit = (e, body, selectedImage) => {
@@ -100,17 +105,17 @@ const App = () => {
     const newId = posts.length + 1;
     const newPost = {
       id: newId,
-      avatar: "https://via.placeholder.com/60",
-      username: "UsuarioNuevo",
-      postImage: selectedImage || "https://via.placeholder.com/600",
-      message: body || "Nuevo mensaje",
+      avatar: 'https://via.placeholder.com/60',
+      username: 'UsuarioNuevo',
+      postImage: selectedImage || 'https://via.placeholder.com/600',
+      message: body || 'Nuevo mensaje',
     };
     setPosts([...posts, newPost]);
     closeModal();
   };
 
   const handlePostDismiss = (postId) => {
-    setPosts(posts.filter(post => post.id !== postId));
+    setPosts(posts.filter((post) => post.id !== postId));
   };
 
   const handleChatClick = (chat) => {
@@ -120,14 +125,13 @@ const App = () => {
   };
 
   const handleChatDismiss = (chatId) => {
-    setChats(chats.filter(chat => chat.id !== chatId));
+    setChats(chats.filter((chat) => chat.id !== chatId));
   };
 
   async function generateRandomPost() {
-    let newPost = await getPosts(posts)
-
+    let newPost = await getPosts(posts);
     return newPost;
-  };
+  }
 
   const handleBackToChats = () => {
     setActiveChat(null);
@@ -142,7 +146,7 @@ const App = () => {
       id: randomId,
       avatar: randomAvatar,
       username: `Usuario${randomId}`,
-      message: randomMessage
+      message: randomMessage,
     };
   };
 
@@ -151,13 +155,12 @@ const App = () => {
     setIsLoadingPosts(true);
     try {
       let newPosts = await generateRandomPost();
-      setPosts(prevPosts => [...prevPosts, ...newPosts]);
+      setPosts((prevPosts) => [...prevPosts, ...newPosts]);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
   }
   };
-  
 
   const loadMoreChats = () => {
     if (!isLoadingChats) {
@@ -168,14 +171,14 @@ const App = () => {
           const newChat = generateRandomChat();
           newChats.push(newChat);
         }
-        setChats(prevChats => [...prevChats, ...newChats]);
+        setChats((prevChats) => [...prevChats, ...newChats]);
         setIsLoadingChats(false);
       }, 1000);
     }
   };
 
   const toggleView = () => {
-    setShowPosts(prev => !prev);
+    setShowPosts((prev) => !prev);
   };
 
   const handleLoginSuccess = () => {
@@ -183,18 +186,14 @@ const App = () => {
     localStorage.setItem('isLoggedIn', 'true');
     setUsername(localStorage.getItem('username'));
   };
-  
-  const [showProfile, setShowProfile] = useState(false); // Estado para controlar la visibilidad de ProfilePage
-  const toggleProfile = () => {
-    setShowProfile(prev => !prev); // Alternar visibilidad de ProfilePage
-  };
-  
+
   if (!isLoggedIn) {
     return <LoginGoogle onLoginSuccess={handleLoginSuccess} />;
   }
+
   const SetreloadPost = () => {
     setReload();
-  }
+  };
 
   const uniquePosts = [...new Set(posts.map((post) => post.id))].map((id) => posts.find((post) => post.id === id));
 
@@ -227,11 +226,18 @@ const App = () => {
             />
           </div>
         ))}
-
         {isLoadingPosts && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Cargando más publicaciones...</p>}
       </div>
-      <div style={{ flex: 1, padding: '1rem', backgroundColor: '#191919', overflowY: 'auto', display: (!showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile) ? 'block' : 'none' }}>
-        {chats.map(chat => (
+      <div
+        style={{
+          flex: 1,
+          padding: '1rem',
+          backgroundColor: '#191919',
+          overflowY: 'auto',
+          display: !showPosts && !isModalOpen && !activeChat && !showGameLibrary && !showProfile ? 'block' : 'none',
+        }}
+      >
+        {chats.map((chat) => (
           <Chat
             key={chat.id}
             id={chat.id}
@@ -248,26 +254,37 @@ const App = () => {
         <Modal isOpen={isModalOpen} onClose={closeModal} onSubmit={handleSubmit} />
       </div>
       <div style={{ display: activeChat ? 'block' : 'none', height: '100%' }}>
-        {activeChat &&<Messages
-          chatId={activeChat.id}
-          avatar={activeChat.avatar}
-          username={activeChat.username}
-          message={activeChat.message}
-          myUser={username}
-          onBack={handleBackToChats}
-        />}
+        {activeChat && (
+          <Messages
+            chatId={activeChat.id}
+            avatar={activeChat.avatar}
+            username={activeChat.username}
+            message={activeChat.message}
+            myUser={username}
+            onBack={handleBackToChats}
+          />
+        )}
       </div>
       <div style={{ display: showGameLibrary ? 'block' : 'none', height: '100%' }}>
         {showGameLibrary && <GameLibrary />}
       </div>
-      <footer className="footer rounded-b-5xl" style={{ display: (isModalOpen || activeChat) ? 'none' : 'flex' }}>
+      <div style={{ display: showProfile ? 'block' : 'none', height: '100%' }}>
+        {showProfile && <ProfilePage />}
+      </div>
+      <footer
+        className="footer rounded-b-5xl"
+        style={{ display: isModalOpen || activeChat ? 'none' : 'flex' }}
+      >
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={home} className="text-3xl" onClick={reloadPage} />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2">
           <IonIcon icon={search} onClick={toggleGameLibrary} className="text-3xl" />
         </button>
-        <button className="h-28 w-32 border-gradient-plus flex items-center justify-center focus:outline-none -mt-2" onClick={openModal}>
+        <button
+          className="h-28 w-32 border-gradient-plus flex items-center justify-center focus:outline-none -mt-2"
+          onClick={openModal}
+        >
           <IonIcon icon={add} className="text-5xl text-white" />
         </button>
         <button className="h-20 w-20 rounded-full flex items-center justify-center mx-2" onClick={toggleView}>
@@ -289,4 +306,3 @@ const App = () => {
 };
 
 export default App;
-
