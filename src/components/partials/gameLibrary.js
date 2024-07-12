@@ -172,18 +172,20 @@ const GameLibrary = () => {
       </div>
 
       {/* Lista de juegos */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {filteredGames.map((game) => (
-          <div key={game.id} className="bg-black rounded-lg overflow-hidden shadow-md">
-            <img src={game.coverImage} alt={game.title} className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h4 className="font-bold text-lg">{game.title}</h4>
-              <p className="text-gray-600 truncate">{game.description}</p>
-              <p className="mt-2 text-gray-800">Console: {game.console}</p>
-              <p className="text-gray-800">Year: {game.jhh}</p>
+      <div className="mt-8 overflow-y-auto max-h-96">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {filteredGames.map((game) => (
+            <div key={game.id} className="bg-black rounded-lg overflow-hidden shadow-md">
+              <img src={game.coverImage} alt={game.title} className="w-full h-40 object-cover" />
+              <div className="p-4">
+                <h4 className="font-bold text-lg">{game.title}</h4>
+                <p className="text-gray-600 truncate">{game.description}</p>
+                <p className="mt-2 text-gray-800">Console: {game.console}</p>
+                <p className="text-gray-800">Year: {game.jhh}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
