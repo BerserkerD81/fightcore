@@ -22,7 +22,6 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 import './index.css';
 
-// Configurar Ionic React
 setupIonicReact();
 
 const App = () => {
@@ -140,16 +139,16 @@ const App = () => {
     };
   };
 
-  const loadMorePosts = () => {
+  const loadMorePosts = async () => {
     if (!isLoadingPosts) {
-      setIsLoadingPosts(true);
-      setTimeout(async () => {
-        let newPosts = await generateRandomPost();
-
-        setPosts(prevPosts => [...prevPosts, ...newPosts]);
-        setIsLoadingPosts(false);
-      }, 1000);
+    setIsLoadingPosts(true);
+    try {
+      let newPosts = await generateRandomPost();
+      setPosts(prevPosts => [...prevPosts, ...newPosts]);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
     }
+  }
   };
   
 
