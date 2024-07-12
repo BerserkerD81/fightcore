@@ -250,7 +250,6 @@ const App = () => {
               game={post.game}
               currentUser={{
                 username: username,
-                profileImage: profileImage,
               }}
             />
           </div>

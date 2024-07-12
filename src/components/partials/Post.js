@@ -31,11 +31,11 @@ const Post = ({ id,avatar, username, postImage, message, currentUser ,game}) => 
       const newChatKey = await createChatBetweenUsers(
         {
           username: currentUser.username,
-          profileImage: currentUser.profileImage
+          profileImage: ''
         },
         {
           username: username,
-          profileImage: avatar
+          profileImage: ''
         }
       );
       console.log(`Chat creado con ID: ${newChatKey}`);
