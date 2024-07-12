@@ -1,6 +1,6 @@
 import {set, ref, push, get, onValue,query } from "firebase/database";
 import { database } from './firebaseConfig';
-
+import Swal from 'sweetalert';
 
 // Función para almacenar un mensaje
 export const saveMessage = async (chatId, message) => {
@@ -166,8 +166,12 @@ export const createChatBetweenUsers = async (user1, user2) => {
   }
 };
 
-export const subirPublicacion = async(cuerpo, imagen) => {
+export const subirPublicacion = async(cuerpo, imagen,juego) => {
   try {
+    if (!cuerpo || !imagen) {
+      Swal("Error", "No puede subir una publicación vacía", "error");
+      return;
+    }
     const user = localStorage.getItem('username')
     const date = new Date().toLocaleDateString('es-ES',{
       day: '2-digit',
@@ -180,7 +184,8 @@ export const subirPublicacion = async(cuerpo, imagen) => {
       creador: user,
       imagen: imagen,
       cuerpo: cuerpo,
-      fecha_creacion: date
+      fecha_creacion: date,
+      game: juego
       //juego: juego,
     })
       .then(() => {
@@ -196,25 +201,52 @@ export const subirPublicacion = async(cuerpo, imagen) => {
   }
 };
 
-export const getPosts = async () => {
+export const getPosts = async (posts) => {
   const publicacionesRef = ref(database, 'publicaciones');
   const q = query(publicacionesRef);
 
   const snapshot = await get(q);
   if (snapshot.exists()) {
-    const posts = [];
+    const newPosts = [];
     snapshot.forEach(childSnapshot => {
       const data = childSnapshot.val();
-      posts.push({
-        id: childSnapshot.key,
-        username: data.creador,
-        postImage: `data:image/jpeg;base64,${data.imagen}`,
-        message: data.cuerpo,
-        createdAt: data.fecha_creacion,
-      });
+      const existsInPosts = posts.some(post => post.id === childSnapshot.key); // Verificar si el post ya existe en la lista actual
+
+      if (!existsInPosts) {
+        newPosts.push({
+          id: childSnapshot.key,
+          username: data.creador,
+          postImage: `data:image/jpeg;base64,${data.imagen}`,
+          message: data.cuerpo,
+          createdAt: data.fecha_creacion,
+        });
+      } else {
+        console.warn(`El post con ID ${childSnapshot.key} ya existe en la lista de posts.`);
+      }
     });
-    return posts.reverse()
+
+    return newPosts.reverse();
   } else {
     return [];
   }
 };
+
+
+export const mostrarJuegos = async () => {
+  const juegosRef = ref(database, 'games');
+  const q = query(juegosRef);
+
+  const snapshot = await get(q);
+  if (snapshot.exists()) {
+    const juegos = [];
+    snapshot.forEach(childSnapshot => {
+      juegos.push({
+        id: childSnapshot.key,
+        ...childSnapshot.val()
+      });
+    });
+    return juegos;
+  } else {
+    return [];
+  }
+}
