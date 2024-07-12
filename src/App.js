@@ -9,7 +9,7 @@ import Messages from './components/partials/Messages';
 import LoginGoogle from './components/partials/LoginGoogle';
 import GameLibrary from './components/partials/gameLibrary';
 import ProfilePage from './components/partials/ProfilePage'; 
-import { findChatsByUsername } from './firebaseFuntions';
+import {getPosts, findChatsByUsername } from './firebaseFuntions';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
@@ -27,29 +27,7 @@ setupIonicReact();
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario1",
-      postImage: "https://via.placeholder.com/600",
-      message: "Este es el mensaje de la publicación 1."
-    },
-    {
-      id: 2,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario2",
-      postImage: "https://via.placeholder.com/600",
-      message: "Este es el mensaje de la publicación 2."
-    },
-    {
-      id: 3,
-      avatar: "https://via.placeholder.com/60",
-      username: "Usuario3",
-      postImage: "https://via.placeholder.com/600",
-      message: "Este es el mensaje de la publicación 3."
-    }
-  ]);
+  const [posts, setPosts] = useState([]);
   const [chats, setChats] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
@@ -70,6 +48,7 @@ const App = () => {
       setUsername(storedUsername);
       setProfileImage(storedProfileImage);
       setIsLoggedIn(true);
+      loadMorePosts();
     }
 
     const handleScroll = () => {
@@ -138,19 +117,10 @@ const App = () => {
     setChats(chats.filter(chat => chat.id !== chatId));
   };
 
-  const generateRandomPost = () => {
-    const randomId = Math.floor(Math.random() * 1000);
-    const randomAvatar = `https://via.placeholder.com/60?text=User${randomId}`;
-    const randomPostImage = `https://via.placeholder.com/600?text=Post${randomId}`;
-    const randomMessage = `Este es el mensaje de la publicación ${randomId}.`;
+  async function generateRandomPost() {
+    let newPost = await getPosts()
 
-    return {
-      id: randomId,
-      avatar: randomAvatar,
-      username: `Usuario${randomId}`,
-      postImage: randomPostImage,
-      message: randomMessage
-    };
+    return newPost;
   };
 
   const handleBackToChats = () => {
@@ -170,16 +140,16 @@ const App = () => {
     };
   };
 
-  const loadMorePosts = () => {
-    if (!isLoadingPosts) {
+ const loadMorePosts = () => {
+      if (!isLoadingPosts) {
       setIsLoadingPosts(true);
-      setTimeout(() => {
-        const newPosts = [];
-        for (let i = 0; i < 3; i++) {
-          const newPost = generateRandomPost();
-          newPosts.push(newPost);
+      setTimeout(async () => {
+        let newPosts = await generateRandomPost()
+        const test = [];
+        for (let i = 0; i < newPosts.length; i++) {
+          test.push(newPosts[i]);
         }
-        setPosts(prevPosts => [...prevPosts, ...newPosts]);
+        setPosts(prevPosts => [...prevPosts, ...test]);
         setIsLoadingPosts(false);
       }, 1000);
     }

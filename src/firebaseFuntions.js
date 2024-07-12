@@ -1,4 +1,4 @@
-import {set, ref, push, get, onValue,query, orderByChild, limitToLast, startAt } from "firebase/database";
+import {set, ref, push, get, onValue,query } from "firebase/database";
 import { database } from './firebaseConfig';
 
 
@@ -196,31 +196,24 @@ export const subirPublicacion = async(cuerpo, imagen) => {
   }
 };
 
-export const getPosts = async (limitCount, startAfterTimestamp) => {
+export const getPosts = async () => {
   const publicacionesRef = ref(database, 'publicaciones');
-  
-  let q = query(publicacionesRef, orderByChild('fecha_creacion'), limitToLast(limitCount));
-
-  if (startAfterTimestamp) {
-    q = query(publicacionesRef, orderByChild('fecha_creacion'), startAt(startAfterTimestamp), limitToLast(limitCount));
-  }
+  const q = query(publicacionesRef);
 
   const snapshot = await get(q);
-
   if (snapshot.exists()) {
     const posts = [];
     snapshot.forEach(childSnapshot => {
       const data = childSnapshot.val();
       posts.push({
         id: childSnapshot.key,
-        avatar: "https://via.placeholder.com/60", // Cambia esto si tienes avatares de usuarios
         username: data.creador,
         postImage: `data:image/jpeg;base64,${data.imagen}`,
         message: data.cuerpo,
         createdAt: data.fecha_creacion,
       });
     });
-    return posts.reverse(); // Reversing since we used limitToLast to get the most recent ones
+    return posts.reverse()
   } else {
     return [];
   }
