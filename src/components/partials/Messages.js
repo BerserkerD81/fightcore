@@ -5,10 +5,11 @@ import { CameraResultType, CameraSource } from '@capacitor/camera';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faMicrophoneSlash, faCamera, faPaperPlane, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FaWaveSquare } from 'react-icons/fa';
+import { saveMessage, loadMessages, getProfileImageByUsername } from '../../firebaseFuntions';
 
 const { Camera } = Plugins;
 
-const Messages = ({ username, avatar, onBack }) => {
+const Messages = ({ chatId, username, avatar, onBack, myUser }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [recording, setRecording] = useState(false);
@@ -45,38 +46,31 @@ const Messages = ({ username, avatar, onBack }) => {
   }, []);
 
   useEffect(() => {
-    const initialMessages = [
-      {
-        id: 1,
-        text: '¡Hola! ¿Cómo estás?',
-        timestamp: '2024-06-29T10:30:00Z',
-        sender: 'user',
-      },
-      {
-        id: 2,
-        text: '¡Hola! Estoy bien, ¿y tú?',
-        timestamp: '2024-06-29T10:32:00Z',
-        sender: chatPartner,
-      },
-      {
-        id: 3,
-        image: 'https://via.placeholder.com/300',
-        timestamp: '2024-06-29T10:35:00Z',
-        sender: chatPartner,
-      },
-      {
-        id: 4,
-        text: '¡Qué bonita foto!',
-        timestamp: '2024-06-29T10:36:00Z',
-        sender: chatPartner,
-      },
-    ];
+    const fetchProfileImage = async () => {
+      try {
+        const profileImage = await getProfileImageByUsername(username);
+        setChatPartnerAvatar(profileImage);
+      } catch (error) {
+        console.error('Error al obtener la imagen de perfil:', error);
+      }
+    };
 
-    setMessages(initialMessages);
-  }, []);
+    fetchProfileImage();
+  }, [username]);
+
+  useEffect(() => {
+    const handleNewMessages = (loadedMessages) => {
+      setMessages(loadedMessages);
+      if (scrollRef.current) {
+        scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    };
+
+    loadMessages(chatId, handleNewMessages);
+  }, [chatId]);
 
   const updateAudioWaves = (duration) => {
-    const wavesCount = Math.ceil(duration / 100); 
+    const wavesCount = Math.ceil(duration / 100);
     const waves = Array.from({ length: wavesCount }, (_, index) => ({
       id: index,
     }));
@@ -87,20 +81,14 @@ const Messages = ({ username, avatar, onBack }) => {
     if (!newMessage.trim()) return;
 
     const newMessageObj = {
-      id: messages.length + 1,
       text: newMessage,
       timestamp: new Date().toISOString(),
-      sender: 'user',
+      sender: myUser,
     };
 
-
-
-    setMessages([...messages, newMessageObj,]);
+    console.log(newMessageObj);
+    await saveMessage(chatId, newMessageObj);
     setNewMessage('');
-
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
   };
 
   const takePicture = async () => {
@@ -112,21 +100,17 @@ const Messages = ({ username, avatar, onBack }) => {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.Uri,
+        resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
       });
 
-      const imageUrl = Capacitor.convertFileSrc(image.path);
-
       const newMessageObj = {
-        id: messages.length + 1,
-        image: imageUrl,
+        image: `data:image/jpeg;base64,${image.base64String}`,
         timestamp: new Date().toISOString(),
-        sender: 'user',
+        sender: myUser,
       };
 
-
-      setMessages([...messages, newMessageObj]);
+      await saveMessage(chatId, newMessageObj);
 
     } catch (error) {
       console.error('Error al tomar la foto:', error);
@@ -157,14 +141,12 @@ const Messages = ({ username, avatar, onBack }) => {
       };
 
       const newMessageObj = {
-        id: messages.length + 1,
         audio: audioFile,
         timestamp: new Date().toISOString(),
-        sender: 'user',
+        sender: myUser,
       };
 
-
-      setMessages([...messages, newMessageObj, ]);
+      await saveMessage(chatId, newMessageObj);
       setRecording(false);
     } catch (error) {
       console.error('Error al detener la grabación:', error);
@@ -217,9 +199,9 @@ const Messages = ({ username, avatar, onBack }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="bg-custom text-white p-4 flex items-center" style={{ zIndex: 10 }}>
-        <img src={chatPartnerAvatar} alt="Avatar" className="w-12 h-12 rounded-full mr-4" />
-        <h2 className="text-lg font-bold  " style={{color:'turquoise'}}>{chatPartner}</h2>
-        <button onClick={onBack} style={{ marginLeft: 'auto', padding: '0.5rem',  border: 'none', borderRadius: '5px',color:'magenta', cursor: 'pointer' }}>
+        <img src={`data:image/jpeg;base64,${chatPartnerAvatar}`} alt="Avatar" className="w-12 h-12 rounded-full mr-4" />
+        <h2 className="text-lg font-bold" style={{ color: 'turquoise' }}>{chatPartner}</h2>
+        <button onClick={onBack} style={{ marginLeft: 'auto', padding: '0.5rem', border: 'none', borderRadius: '5px', color: 'magenta', cursor: 'pointer' }}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
       </div>
@@ -231,94 +213,96 @@ const Messages = ({ username, avatar, onBack }) => {
         {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`mb-4 ${message.sender === 'user' ? 'self-end' : 'self-start'}`}
+            className={`mb-4 ${message.sender === myUser ? 'self-end' : 'self-start'}`}
             ref={index === messages.length - 1 ? scrollRef : null}
           >
             <div
-              className={`p-2 rounded-lg ${message.sender === 'user' ? 'bg-turquoise text-white self-end' : 'bg-magenta text-white self-start'}`}
-              style={{ maxWidth: '75%', wordWrap: 'break-word' }}
+              className={`p-2 rounded-lg ${message.sender === myUser ? 'bg-turquoise text-white self-end' : 'bg-magenta text-white self-start'}`}
+              style={{ maxWidth: '75%', wordWrap: 'break-word', backgroundColor: currentPlaying === message.id ? 'lightgreen' : '' }}
             >
+              <span className="block text-xs text-white mt-1 font-bold italic">{message.sender}:</span>
+
               {message.text && <p>{message.text}</p>}
               {message.image && (
-                <img
-                  src={message.image}
-                  alt="Sent"
-                  className="max-w-full h-auto rounded-lg mt-2 cursor-pointer"
-                  onClick={() => openFullscreenImage(message.image)}
-                />
-              )}
-              {message.audio && (
-                <div className="audio-player-container flex items-center">
-                  <button
-                    className={`bg-green-500 hover:bg-green-600 text-white rounded-lg p-2 ${currentPlaying === message.id ? 'pulse' : ''}`}
-                    onClick={() => playAudio(message.audio.path, message.audio.duration, message.id)}
-                  >
-                    <FaWaveSquare className="wave-icon" />
-                  </button>
-                  <div className="progress-bar flex items-center ml-2">
-                    <div className="progress-bar-filled" style={{ width: `${currentPlaying === message.id ? progress : 0}%` }}>
-                      {/* Audio Waves */}
-                      <div className="audio-waves">
-                        {currentAudioWaves.map(wave => (
-                          <div key={wave.id} className="audio-wave"></div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 self-end ml-2">{`${(message.audio.duration / 1000).toFixed(1)}s`}</p>
+                <div className="flex items-center justify-center"> {/* Ajuste vertical y horizontal */}
+                  <img
+                    src={message.image}
+                    alt="Sent"
+                    className="max-w-full h-auto rounded-lg mt-2 cursor-pointer"
+                    onClick={() => openFullscreenImage(message.image)}
+                  />
                 </div>
               )}
-              <p className="text-xs text-gray-500 self-end mt-1">{new Date(message.timestamp).toLocaleTimeString()}</p>
+{message.audio && (
+  <div className={`audio-player-container flex items-center ${currentPlaying === message.id ? 'bg-gray-200' : ''}`}>
+    <button
+      className="bg-transparent border-none outline-none cursor-pointer"
+      onClick={() => playAudio(message.audio.path, message.audio.duration, message.id)}
+    >
+      {currentPlaying === message.id ? (
+        <FontAwesomeIcon icon={faMicrophoneSlash} className="text-white" />
+      ) : (
+        <FontAwesomeIcon icon={faMicrophone} className="text-white" />
+      )}
+    </button>
+    <div className="flex items-center ml-2 flex-1">
+      {currentPlaying === message.id && (
+        <>
+          <div className="progress-bar-container ml-2 flex-1">
+            <div className="progress-bar" style={{ width: `${progress}%`, backgroundColor: 'lightblue', height: '5px' }} />
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+
             </div>
           </div>
         ))}
-      </div>
-      {fullscreenImage && (
-        <div className="fixed top-0 left-0 bottom-0 right-0 z-50 bg-black flex items-center justify-center" style={{ overflow: 'auto' }}>
-          <img
-            src={fullscreenImage}
-            alt="Fullscreen"
-            className="max-w-screen-xl max-h-screen cursor-pointer"
+
+        {fullscreenImage && (
+          <div
+            className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50"
             onClick={closeFullscreenImage}
-          />
-        </div>
-      )}
-      <div className="fixed bottom-0 left-0 right-0 p-4" style={{ bottom: '0px' }}>
-        <div className="flex items-center">
+          >
+            <img src={fullscreenImage} alt="Fullscreen" className="max-w-full max-h-full" />
+          </div>
+        )}
+      </div>
+      <div className="p-4 flex items-center border-t border-gray-300" style={{ position: 'relative', zIndex: 20 }}>
+        <div className="flex items-center w-full bg-white rounded-full shadow-md px-3 py-2">
           <input
             type="text"
-            className="flex-1 border rounded-lg py-2 px-4 text-black outline-none"
-            placeholder="Escribe un mensaje..."
             value={newMessage}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
-            style={{ zIndex: 10 }}
+            className="flex-1 w-full px-2 py-1 border-none rounded-full outline-none mx-1"
+            style={{ minWidth: '0', color: 'black' }}
           />
           <button
-            className="rounded-lg p-2 ml-2"
-            style={{ backgroundColor: recording ? '#E53E3E' : '#48BB78', color: 'white' }}
             onClick={recording ? stopRecording : startRecording}
+            className="bg-magenta text-white p-2 rounded-full border-none outline-none cursor-pointer mx-1"
           >
             <FontAwesomeIcon icon={recording ? faMicrophoneSlash : faMicrophone} />
           </button>
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2"
             onClick={takePicture}
+            className="bg-magenta text-white p-2 rounded-full border-none outline-none cursor-pointer mx-1"
           >
             <FontAwesomeIcon icon={faCamera} />
           </button>
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2"
             onClick={sendMessage}
+            className="bg-magenta text-white p-2 rounded-full border-none outline-none cursor-pointer mx-1"
           >
             <FontAwesomeIcon icon={faPaperPlane} />
           </button>
         </div>
       </div>
-      <audio ref={audioPlayerRef} className="hidden" controls />
     </div>
   );
-  
 };
 
 export default Messages;

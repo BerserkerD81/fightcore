@@ -3,6 +3,7 @@ import { IonIcon } from '@ionic/react';
 import { camera } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { signInWithEmailAndPassword, registerWithEmailAndPassword } from '../firebaseFuntions';
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 
 const LoginGoogle = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
@@ -31,29 +32,53 @@ const LoginGoogle = ({ onLoginSuccess }) => {
     signInWithEmailAndPassword(username, password)
       .then((userData) => {
         console.log('Usuario inició sesión:', userData);
-        localStorage.setItem('username', userData.userName); // Guardar nombre de usuario en localStorage
-        localStorage.setItem('profileImageBase64', userData.profileImage); // Guardar imagen de perfil en localStorage
-        onLoginSuccess(); // Llamar a la función de éxito de inicio de sesión
+        localStorage.setItem('username', userData.username);
+        localStorage.setItem('profileImageBase64', userData.profileImage);
+        onLoginSuccess();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Inicio de sesión exitoso!',
+          text: `Bienvenido, ${userData.username}!`,
+        });
       })
       .catch((error) => {
         console.error('Error de inicio de sesión:', error.message);
+        Swal.fire({
+          icon: 'error',
+          title: '¡Error!',
+          text: error.message,
+        });
       });
   };
 
   const onRegister = () => {
     if (!profileImageBase64) {
-      console.error('Selecciona una imagen de perfil antes de registrar.');
+      Swal.fire({
+        icon: 'error',
+        title: '¡Error!',
+        text: 'Selecciona una imagen de perfil antes de registrar.',
+      });
       return;
     }
 
     registerWithEmailAndPassword(username, fullName, password, profileImageBase64)
       .then(() => {
         console.log('Usuario registrado exitosamente.');
-        localStorage.setItem('username', username); // Guardar nombre de usuario en localStorage
-        onLoginSuccess(); // Llamar a la función de éxito de inicio de sesión
+        localStorage.setItem('username', username);
+        onLoginSuccess();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Registro exitoso!',
+          text: 'Bienvenido a nuestra plataforma.',
+        });
       })
       .catch((error) => {
         console.error('Error al registrar usuario:', error.message);
+        Swal.fire({
+          icon: 'error',
+          title: '¡Error!',
+          text: error.message,
+        });
       });
   };
 
@@ -62,7 +87,7 @@ const LoginGoogle = ({ onLoginSuccess }) => {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.Base64, // Obtener imagen en base64 directamente
+        resultType: CameraResultType.Base64,
         source: source,
       });
 
@@ -71,6 +96,11 @@ const LoginGoogle = ({ onLoginSuccess }) => {
       }
     } catch (error) {
       console.error('Error seleccionando la imagen:', error);
+      Swal.fire({
+        icon: 'error',
+        title: '¡Error!',
+        text: 'Error seleccionando la imagen.',
+      });
     }
   };
 
