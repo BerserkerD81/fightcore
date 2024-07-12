@@ -55,6 +55,17 @@ const ProfilePage = ({ username, profileImage, posts }) => {
           </>
         )}
       </div>
+
+      <div className="posts-container" style={styles.postsContainer}>
+        <h3 style={styles.postsTitle}>Publicaciones</h3>
+        {/* Renderizar las publicaciones aquí */}
+        {posts.map((post, index) => (
+          <div key={index} style={styles.postCard}>
+            <h4 style={styles.postTitle}>{post.title}</h4>
+            <p style={styles.postContent}>{post.content}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -105,39 +116,30 @@ const styles = {
     borderRadius: '5px',
     borderColor: '#ccc',
   },
-  gameSelector: {
+  postsContainer: {
     marginTop: '20px',
     textAlign: 'center',
   },
-  label: {
-    display: 'block',
+  postsTitle: {
+    fontSize: '20px',
+    fontWeight: 'bold',
     marginBottom: '10px',
   },
-  select: {
-    padding: '10px',
-    borderRadius: '5px',
-    borderColor: '#ccc',
-  },
-  gameDetails: {
-    marginTop: '20px',
-  },
-  gameCard: {
+  postCard: {
     border: '1px solid #ccc',
     borderRadius: '5px',
     padding: '20px',
     textAlign: 'center',
+    marginBottom: '10px',
   },
-  gameTitle: {
-    fontSize: '20px',
+  postTitle: {
+    fontSize: '18px',
     fontWeight: 'bold',
   },
-  gameImage: {
-    width: '200px',
-    height: 'auto',
-    marginBottom: '10px',
+  postContent: {
+    margin: '10px 0',
   },
 };
 
 export default ProfilePage;
-
 
